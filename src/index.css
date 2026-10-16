@@ -1,0 +1,229 @@
+@import '@xyflow/react/dist/style.css';
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --color-ink-950: #08080d;
+  --color-ink-900: #0b0b12;
+  --color-ink-850: #0e0e17;
+  --color-ink-800: #12121d;
+  --color-ink-700: #1a1a28;
+}
+
+@property --fa-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+*::-webkit-scrollbar { width: 9px; height: 9px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); background-clip: content-box; }
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--color-ink-950);
+  color: #e9e9f2;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+::selection { background: rgba(139, 92, 246, 0.4); }
+
+/* ───────────── Surfaces ───────────── */
+.glass {
+  background: linear-gradient(180deg, rgba(18, 18, 28, 0.86), rgba(12, 12, 19, 0.92));
+  backdrop-filter: blur(16px) saturate(140%);
+  border-color: rgba(255, 255, 255, 0.07);
+}
+.canvas-shell {
+  background:
+    radial-gradient(1100px 620px at 18% -8%, rgba(124, 92, 255, 0.13), transparent 62%),
+    radial-gradient(900px 540px at 96% 108%, rgba(217, 70, 239, 0.1), transparent 60%),
+    radial-gradient(700px 500px at 60% 45%, rgba(56, 189, 248, 0.05), transparent 65%),
+    var(--color-ink-950);
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid rgba(167, 139, 250, 0.75);
+  outline-offset: 2px;
+}
+
+/* ───────────── Le nœud ───────────── */
+.flux-node {
+  position: relative;
+}
+.flux-node .node-body {
+  position: relative;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: linear-gradient(165deg, rgba(26, 26, 40, 0.96), rgba(14, 14, 22, 0.98));
+  box-shadow: 0 10px 26px -14px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: border-color 0.22s ease, box-shadow 0.28s ease, background 0.25s ease;
+}
+.flux-node:hover .node-body {
+  border-color: color-mix(in srgb, var(--cat) 42%, transparent);
+  box-shadow: 0 16px 34px -16px rgba(0, 0, 0, 0.9), 0 0 0 1px color-mix(in srgb, var(--cat) 22%, transparent), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.flux-node.is-selected .node-body {
+  border-color: color-mix(in srgb, var(--cat) 70%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cat) 18%, transparent), 0 18px 40px -18px rgba(0, 0, 0, 0.95);
+}
+.flux-node .node-icon {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+.flux-node:hover .node-icon { transform: scale(1.12) rotate(-4deg); }
+
+/* Halo + anneau conique pendant l'exécution */
+.flux-node.is-running .node-body {
+  border-color: transparent;
+  box-shadow: 0 0 34px -6px color-mix(in srgb, var(--cat) 60%, transparent);
+}
+.flux-node.is-running .node-body::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 15px;
+  padding: 1.5px;
+  background: conic-gradient(from var(--fa-angle), transparent 40%, var(--cat) 78%, #fff 92%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: fa-spin 1.35s linear infinite;
+  pointer-events: none;
+}
+.flux-node.is-running .node-body::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--cat) 22%, transparent) 50%, transparent 70%);
+  background-size: 240% 100%;
+  animation: shimmer 1.5s linear infinite;
+  pointer-events: none;
+}
+.flux-node.is-success .node-body { border-color: color-mix(in srgb, #34d399 55%, transparent); }
+.flux-node.is-error .node-body {
+  border-color: color-mix(in srgb, #f87171 65%, transparent);
+  animation: shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  box-shadow: 0 0 30px -8px rgba(248, 113, 113, 0.55);
+}
+.flux-node.is-skipped { opacity: 0.45; filter: saturate(0.4); }
+.flux-node.is-disabled .node-body { opacity: 0.55; border-style: dashed; }
+
+@keyframes fa-spin { to { --fa-angle: 360deg; } }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -40% 0; } }
+@keyframes shake {
+  10%, 90% { transform: translateX(-1.5px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-5px); }
+  40%, 60% { transform: translateX(5px); }
+}
+@keyframes pop-in {
+  0% { transform: scale(0.4); opacity: 0; }
+  70% { transform: scale(1.18); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.pop-in { animation: pop-in 0.34s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55); }
+  50% { box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
+}
+
+/* ───────────── Arêtes ───────────── */
+.react-flow__edge-path { transition: stroke 0.28s ease, stroke-width 0.2s ease; }
+.react-flow__edge.selected .react-flow__edge-path { stroke: #a78bfa !important; }
+.edge-flow {
+  fill: none;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-dasharray: 9 15;
+  animation: dash-move 0.55s linear infinite;
+  filter: drop-shadow(0 0 5px currentColor);
+}
+@keyframes dash-move { to { stroke-dashoffset: -24; } }
+
+/* ───────────── Handles ───────────── */
+.react-flow__handle {
+  width: 11px;
+  height: 11px;
+  background: #0d0d15;
+  border: 2px solid rgba(148, 163, 184, 0.55);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+.react-flow__handle:hover {
+  border-color: var(--cat, #a78bfa);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--cat, #a78bfa) 22%, transparent);
+  transform: translate(-50%, -50%) scale(1.22);
+}
+.react-flow__handle.connectingfrom, .react-flow__handle.connectingto {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 6px rgba(167, 139, 250, 0.2);
+}
+
+/* ───────────── Chrome React Flow ───────────── */
+.react-flow__attribution { background: transparent !important; color: rgba(255, 255, 255, 0.16) !important; font-size: 9px; }
+.react-flow__attribution a { color: rgba(255, 255, 255, 0.22) !important; }
+.react-flow__controls {
+  box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.9);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+.react-flow__controls-button {
+  background: rgba(15, 15, 24, 0.9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  fill: rgba(233, 233, 242, 0.75);
+  width: 30px;
+  height: 30px;
+}
+.react-flow__controls-button:hover { background: rgba(30, 30, 46, 0.95); fill: #fff; }
+.react-flow__minimap {
+  background: rgba(10, 10, 17, 0.82) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.react-flow__minimap-mask { fill: rgba(8, 8, 13, 0.66); }
+.react-flow__node { font-family: var(--font-sans); }
+.react-flow__node.selected .node-body { border-color: color-mix(in srgb, var(--cat) 70%, transparent); }
+.react-flow__edge-text { fill: #cbd5e1; }
+.react-flow__handle-left { left: -6px; }
+.react-flow__handle-right { right: -6px; }
+
+/* ───────────── Divers ───────────── */
+.tabular { font-variant-numeric: tabular-nums; }
+.text-glow { text-shadow: 0 0 18px color-mix(in srgb, currentColor 55%, transparent); }
+.btn-press { transition: transform 0.12s ease, filter 0.2s ease, background 0.2s ease, box-shadow 0.25s ease; }
+.btn-press:active { transform: scale(0.965); }
+.run-glow { box-shadow: 0 8px 26px -8px rgba(139, 92, 246, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+.run-glow:hover { filter: brightness(1.12); box-shadow: 0 10px 30px -8px rgba(139, 92, 246, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(233, 233, 242, 0.6);
+}
+.hairline { border-color: rgba(255, 255, 255, 0.07); }
