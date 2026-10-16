@@ -11,6 +11,10 @@ anneau d'exécution sur les nœuds, panneaux à ressorts).
 
 ![Fluxia — canvas de workflow avec nœuds connectés](docs/screenshot.png)
 
+**🌐 Démo en ligne : [ck526438-lgtm.github.io/fluxia](https://ck526438-lgtm.github.io/fluxia/)** —
+redéployée automatiquement à chaque push. Version 100 % navigateur : le relais local
+(Slack, Google Sheets, API fermées CORS) reste un extra de l'installation locale.
+
 ## Démarrage
 
 ```bash
