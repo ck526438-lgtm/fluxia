@@ -7,7 +7,7 @@ regarde les données circuler de nœud en nœud en temps réel.
 Interface en français, thème sombre, animations soignées (particules sur les connexions,
 anneau d'exécution sur les nœuds, panneaux à ressorts).
 
-[![CI](https://github.com/ck526438-lgtm/fluxia/actions/workflows/ci.yml/badge.svg)](https://github.com/ck526438-lgtm/fluxia/actions/workflows/ci.yml) ![Stack](https://img.shields.io/badge/React-19-61dafb) ![Vite](https://img.shields.io/badge/Vite-8-646cff) ![TS](https://img.shields.io/badge/TypeScript-5-3178c6)
+[![CI](https://github.com/ck526438-lgtm/fluxia/actions/workflows/ci.yml/badge.svg)](https://github.com/ck526438-lgtm/fluxia/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/Licence-MIT-3f6ad8)](LICENSE) ![Stack](https://img.shields.io/badge/React-19-61dafb) ![Vite](https://img.shields.io/badge/Vite-8-646cff) ![TS](https://img.shields.io/badge/TypeScript-5-3178c6)
 
 ![Fluxia — canvas de workflow avec nœuds connectés](docs/screenshot.png)
 

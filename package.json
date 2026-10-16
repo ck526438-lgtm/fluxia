@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "Fluxia — Automatisation visuelle de workflows",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",
