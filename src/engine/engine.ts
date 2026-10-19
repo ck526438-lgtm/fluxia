@@ -1,6 +1,8 @@
 import { getDef } from '../data/catalog';
 import type { FlowNode, FlowNodeData, Item, RunRecord } from '../types';
 import { defaultCtx, resolveDeep, resolveString, type ExprContext } from './expressions';
+import { hasRelay, relayFetch } from './relay';
+import { runVideoNode } from './video';
 
 export interface EngineEdge {
   id: string;
@@ -19,32 +21,6 @@ export interface EngineHooks {
 }
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-
-// ─── Relais local optionnel (server.mjs) : débloque les API qui refusent le navigateur ───
-let relayProbe: Promise<boolean> | null = null;
-
-function hasRelay(): Promise<boolean> {
-  if (!relayProbe) {
-    relayProbe = fetch('/api/health', { signal: AbortSignal.timeout(1500) })
-      .then((r) => r.ok)
-      .catch(() => false);
-  }
-  return relayProbe;
-}
-
-async function relayFetch(
-  url: string,
-  init: { method?: string; headers?: Record<string, string>; body?: string },
-): Promise<{ status: number; body: string }> {
-  const res = await fetch('/api/relay', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ url, ...init }),
-  });
-  const json = (await res.json().catch(() => null)) as { status?: number; body?: string; error?: string } | null;
-  if (!res.ok) throw new Error(String(json?.error ?? `Relais ${res.status}`));
-  return { status: Number(json?.status ?? 0), body: String(json?.body ?? '') };
-}
 
 export function topoOrder(nodes: FlowNode[], edges: EngineEdge[]): { order: FlowNode[]; cycle: boolean } {
   const ids = new Set(nodes.map((n) => n.id));
@@ -748,8 +724,11 @@ async function runNodeCore(
       const target = String(resolved.target_lang ?? 'en');
       return [input.map((item) => ({ ...item, traduction: localTranslate(text, target), langue: target }))];
     }
-    default:
+    default: {
+      const published = await runVideoNode(node, input, ctx);
+      if (published) return published;
       return [input];
+    }
   }
 }
 

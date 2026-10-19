@@ -7,13 +7,17 @@ regarde les données circuler de nœud en nœud en temps réel.
 Interface en français, thème sombre, animations soignées (particules sur les connexions,
 anneau d'exécution sur les nœuds, panneaux à ressorts).
 
+Nouveauté : **publier une vraie vidéo sur 7 réseaux** — YouTube, Mastodon, Bluesky, X,
+Instagram Reels, Facebook Page et TikTok — depuis une simple URL.
+
 [![CI](https://github.com/ck526438-lgtm/fluxia/actions/workflows/ci.yml/badge.svg)](https://github.com/ck526438-lgtm/fluxia/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/Licence-MIT-3f6ad8)](LICENSE) ![Stack](https://img.shields.io/badge/React-19-61dafb) ![Vite](https://img.shields.io/badge/Vite-8-646cff) ![TS](https://img.shields.io/badge/TypeScript-5-3178c6)
 
 ![Fluxia — canvas de workflow avec nœuds connectés](docs/screenshot.png)
 
 **🌐 Démo en ligne : [ck526438-lgtm.github.io/fluxia](https://ck526438-lgtm.github.io/fluxia/)** —
 redéployée automatiquement à chaque push. Version 100 % navigateur : le relais local
-(Slack, Google Sheets, API fermées CORS) reste un extra de l'installation locale.
+(Slack, Google Sheets, publication vidéo, API fermées CORS) reste un extra de
+l'installation locale.
 
 ## Démarrage
 
@@ -28,14 +32,16 @@ Le **relais local** (`server.mjs`, zéro dépendance) est facultatif : sans lui,
 fonctionne déjà à 100 % en navigateur. Il débloque en plus les API qui refusent les
 appels navigateur (CORS) — Slack, Google Sheets, n'importe quelle API fermée via le
 nœud Requête HTTP — en les appelant depuis Node, en local uniquement (127.0.0.1).
+Il est en revanche **obligatoire pour la catégorie Vidéo** : c'est lui qui télécharge
+les octets depuis leur URL et les envoie aux plateformes.
 
 ## Fonctionnalités
 
 ### Éditeur
 - **Canvas infini** : zoom, panoramique, minimap colorée par catégorie, alignement
   automatique des nœuds (dagre), pastille zoom + compteurs nœuds / liens.
-- **37 nœuds** répartis en 6 familles : Déclencheurs, Actions, Logique, Données, IA,
-  Annotations.
+- **44 nœuds** répartis en 7 familles : Déclencheurs, Actions, Vidéo, Logique, Données,
+  IA, Annotations.
 - **Notes autocollantes** : post-it redimensionnables (4 couleurs) pour documenter le
   canvas, sans impact sur l'exécution, rendus derrière les nœuds.
 - **Menu contextuel** (clic droit) :
@@ -51,8 +57,8 @@ nœud Requête HTTP — en les appelant depuis Node, en local uniquement (127.0.
 - **Identifiants** : panneau central pour enregistrer vos clés API une seule fois
   (Brevo, Notion, Telegram, OpenAI…), réutilisables partout avec `{{ $creds.nom }}`.
   Stockage 100 % local (localStorage), bouton dédié dans la barre d'outils.
-- **Modèles prêts à l'emploi** : 5 flux complets (veille API, triage de leads IA,
-  résumé IA, webhook enrichi, traitement de commandes).
+- **Modèles prêts à l'emploi** : 6 flux complets (veille API, triage de leads IA,
+  résumé IA, webhook enrichi, traitement de commandes, publication vidéo multi-réseaux).
 - **Historique** : annuler / rétablir, copier / coller / dupliquer, sauvegarde locale
   automatique (localStorage) avec indicateur « Enregistré », import / export JSON.
 
@@ -90,6 +96,33 @@ concerné avec l'explication exacte (et le lien où créer la clé).
 Astuce : enregistrez vos clés dans le panneau **Identifiants** puis référencez-les
 partout avec `{{ $creds.nom }}` — plus besoin de les ressaisir dans chaque nœud.
 
+### Publier une vidéo sur les réseaux (catégorie Vidéo)
+
+Sept nœuds qui déposent réellement une vidéo sur les plateformes. Le contrat d'API est
+différent partout ; Fluxia parle à chaque API officielle, avec le relais local pour les
+octets :
+
+| Nœud | Ce qui est réellement appelé | Ce qu'il faut | Ce que la plateforme impose |
+| --- | --- | --- | --- |
+| `YouTube` | `POST upload/youtube/v3/videos` en `multipart` (chunk JSON + octets) | Jeton OAuth 2.0 avec le scope `youtube.upload` — une clé API seule ne suffit pas, les comptes de service sont refusés | 100 mises en ligne / jour ; `privacyStatus` par défaut privée chez Fluxia |
+| `Mastodon` | `POST /api/v2/media` puis **polling** `GET /api/v1/media/:id` jusqu'à l'encodage, `POST /api/v1/statuses` avec `media_ids[]` | Jeton personnel de l'instance (Préférences → Développement), scopes `write:media` + `write:statuses` | Limites lues sur `/api/v2/instance` avant l'envoi (MP4/MOV/WebM, 99 Mio par défaut, une seule vidéo par post) ; 30 envois / 30 min |
+| `Bluesky` | `createSession` → `com.atproto.repo.uploadBlob` (octets bruts, sur le **PDS du compte**) → `com.atproto.repo.createRecord` avec `app.bsky.embed.video` | Mot de passe d'application (jamais le mot de passe principal) | MP4 uniquement — le MIME renvoyé par le PDS est vérifié avant publication ; 300 Mio / 10 min sur bsky.social, **5 Mio par défaut sur un PDS auto-hébergé** |
+| `X (Twitter)` | Protocole v2 : `initialize` → `append` **par segments de 5 Mo** → `finalize` → `STATUS` jusqu'à `succeeded` → `POST /2/tweets` | User access token OAuth 2.0 (`media.write` + `tweet.write`) ; un Bearer applicatif est rejeté | Découpage et attente de transcodage gérés automatiquement ; relais obligatoire (pas de CORS) |
+| `Instagram Reels` | `POST /{ig-utilisateur}/media` (`media_type=REELS`, `video_url`) → polling `status_code` → `media_publish` | Compte professionnel lié à une Page, app avec `instagram_content_publish` (en Development Mode, seuls les comptes ayant un rôle publient) | L'URL doit être **publique** : Meta répond 200 même si elle est inaccessible, c'est le polling qui le révèle ; 3 s–15 min ; 15 min entre deux Reels |
+| `Facebook Page` | `POST /{pageId}/videos` avec `file_url` | Jeton Page + `publish_video` | 3 s–15 min, 300 Mio ; 100 publications API / 24 h |
+| `TikTok` | `/v2/post/publish/video/init` en `PULL_FROM_URL` → `status/fetch` jusqu'à `PUBLISH_COMPLETE` | Jeton `video.publish` d'une app **auditable** : sans audit, `SELF_ONLY` et 5 publications / 24 h | Le domaine de l'URL doit être déclaré/vérifié dans le Developer Portal, sans redirection ; `fail_reason` remonté tel quel (ex. `video_pull_failed`) |
+
+Deux règles communes :
+
+- **le relais local doit tourner** (`npm start`) : c'est lui qui récupère la vidéo à partir
+  de son URL, la garde en mémoire 15 minutes et la transmet ;
+- l'**URL doit désigner le fichier directement** (`.mp4`, `.mov`, `.webm`…). Une URL qui
+  renvoie une page HTML est rejetée localement, avant tout envoi vers la plateforme.
+
+Un nœud vidéo ne télécharge **jamais** quoi que ce soit avant d'avoir vérifié les
+identifiants : un jeton oublié échoue en quelques millisecondes avec le chemin exact où
+le créer, plutôt qu'après 200 Mo de transfert.
+
 **Traitement 100 % local, sans clé** : `Requête HTTP`, `Code JS`, `Éditer les champs`,
 `Condition`, `Aiguillage`, `Filtrer`, `Limiter`, `Trier`, `Éclater`, `Agréger`,
 `Dédoublonner`, `Parser JSON`, `Date & Heure`, `Crypto` (SHA-1/256/384/512, Base64, Hex),
@@ -116,15 +149,17 @@ partout avec `{{ $creds.nom }}` — plus besoin de les ressaisir dans chaque nœ
 ## Architecture
 
 ```
-server.mjs                  # Relais local optionnel (/api/relay, /api/sheets-append) + sert dist/
+server.mjs                  # Relais local : /api/relay, /api/sheets-append, /api/video/* + sert dist/
 src/
 ├── types.ts                 # Types partagés (nœud, item, exécution…)
 ├── data/
-│   ├── catalog.tsx          # Définition des 37 nœuds (icône, couleur, params, ports)
+│   ├── catalog.tsx          # Définition des 44 nœuds (icône, couleur, params, ports)
 │   └── templates.ts         # Flux prêts à l'emploi
 ├── engine/
 │   ├── expressions.ts       # Résolution des {{ expressions }} ($json, $items, $creds…)
-│   └── engine.ts            # Orchestrateur + exécuteurs de nœuds + branchements + relais
+│   ├── relay.ts             # Client du relais local (transfert CORS, octets vidéo)
+│   ├── video.ts             # Exécuteurs des 7 publications vidéo (YouTube, X, Mastodon…)
+│   └── engine.ts            # Orchestrateur + exécuteurs de nœuds + branchements
 ├── store/store.ts           # État global (zustand) : graphe, historique, exécution, toasts, identifiants
 └── components/
     ├── Canvas.tsx           # React Flow, minimap, état vide, dépôt des nœuds
@@ -143,8 +178,9 @@ src/
 ```
 
 Ajouter un nœud = ajouter une entrée dans `src/data/catalog.tsx` + un `case` dans
-`runNodeCore` (`src/engine/engine.ts`). Le reste (UI, formulaire, poignées, exécution)
-est automatique.
+`runNodeCore` (`src/engine/engine.ts`). Les nœuds vidéo, plus volumineux, sont isolés
+dans `src/engine/video.ts` et dispatchés par `runVideoNode`. Le reste (UI, formulaire,
+poignées, exécution) est automatique.
 
 ## Notes techniques
 
@@ -161,7 +197,12 @@ est automatique.
   **Requête HTTP** bascule automatiquement par le relais local s'il est lancé —
   sinon l'erreur exacte s'affiche dans le nœud et le journal.
 - **Relais local** : `npm start` écoute uniquement sur 127.0.0.1. Il expose
-  `/api/relay` (transfert générique) et `/api/sheets-append` (signature JWT du
-  compte de service Google). Aucune donnée ne sort de votre machine sans votre flux.
+  `/api/relay` (transfert générique), `/api/sheets-append` (signature JWT du compte de
+  service Google) et `/api/video/*` (téléchargement de la vidéo par URL, puis envoi en
+  `multipart`, `multipart/related` ou octets bruts par tranches). Un fichier est retenu
+  15 minutes en mémoire, 200 Mo maximum, puis libéré dès que le nœud a terminé. Aucune
+  donnée ne sort de votre machine sans votre flux.
+- La **démo GitHub Pages** fonctionne sans relais : tout est réel sauf la catégorie
+  Vidéo, qui demande `npm start` en local (les octets transitent par Node).
 - Données 100 % locales : le flux et les identifiants sont sauvegardés dans le
   `localStorage` du navigateur. Aucun serveur distant, aucun compte, aucune télémétrie.

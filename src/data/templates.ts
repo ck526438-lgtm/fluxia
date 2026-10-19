@@ -162,4 +162,39 @@ export const TEMPLATES: Template[] = [
       };
     },
   },
+  {
+    id: 'publication-video',
+    name: 'Publication vidéo multi-réseaux',
+    description: 'Une vidéo (URL directe) est normalisée puis publiée sur Mastodon, Bluesky et X. Le relais local doit tourner (« npm start ») et chaque réseau exige son jeton.',
+    badges: ['Relais requis', 'Publication réelle'],
+    build: () => {
+      const trigger = n('manualTrigger', 0, 160, {
+        sample: '{\n  "video": "https://exemple.com/clip.mp4",\n  "titre": "Notre lancement du mois",\n  "accroche": "Nouveauté en vidéo — 60 secondes pour tout comprendre."\n}',
+      });
+      const set = n('set', 340, 160, {
+        keepOnly: true,
+        fields: [
+          { key: 'video', value: '{{ $json.video }}' },
+          { key: 'titre', value: '{{ $json.titre }}' },
+          { key: 'accroche', value: '{{ $json.accroche }}' },
+        ],
+      });
+      const mastodon = n('videoMastodon', 680, -140, {
+        videoUrl: '{{ $json.video }}',
+        text: '{{ $json.accroche }}',
+      }, 'Mastodon');
+      const bluesky = n('videoBluesky', 680, 120, {
+        videoUrl: '{{ $json.video }}',
+        text: '{{ $json.accroche }}',
+      }, 'Bluesky');
+      const x = n('videoX', 680, 380, {
+        videoUrl: '{{ $json.video }}',
+        text: '{{ $json.titre }} — {{ $json.accroche }}',
+      }, 'X');
+      return {
+        nodes: [trigger, set, mastodon, bluesky, x],
+        edges: [e(trigger, set), e(set, mastodon), e(set, bluesky), e(set, x)],
+      };
+    },
+  },
 ];

@@ -3,7 +3,7 @@ import type { Node, Edge } from '@xyflow/react';
 
 export type { Edge, Node };
 
-export type NodeCategory = 'trigger' | 'action' | 'logic' | 'data' | 'ai' | 'note';
+export type NodeCategory = 'trigger' | 'action' | 'video' | 'logic' | 'data' | 'ai' | 'note';
 
 export interface CategoryMeta {
   label: string;

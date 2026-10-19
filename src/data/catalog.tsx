@@ -3,12 +3,14 @@ import {
   Code2, CopyX, FileDown, FileText, Filter, GitBranch, Globe, Hash, ListTree, Mail, Merge,
   MessageSquare, MousePointerClick, PenLine, Route, Send, ShieldCheck, Sigma, Smile, Sparkles,
   StickyNote, Table2, Tags, Timer, Webhook, Zap, Layers, Boxes, Terminal,
+  MonitorPlay, AtSign, Feather, MessagesSquare, Camera, ThumbsUp, Music2,
 } from 'lucide-react';
 import type { CategoryMeta, NodeCategory, NodeDef } from '../types';
 
 export const CATEGORIES: Record<NodeCategory, CategoryMeta> = {
   trigger: { label: 'Déclencheurs', hint: 'Point de départ du flux', color: '#a78bfa', soft: 'rgba(167,139,250,0.14)' },
   action: { label: 'Actions', hint: 'Appels externes & envois', color: '#60a5fa', soft: 'rgba(96,165,250,0.14)' },
+  video: { label: 'Vidéo', hint: 'Publication sur les réseaux', color: '#fb7185', soft: 'rgba(251,113,133,0.14)' },
   logic: { label: 'Logique', hint: 'Branchements & contrôle', color: '#fbbf24', soft: 'rgba(251,191,36,0.14)' },
   data: { label: 'Données', hint: 'Transformation & calcul', color: '#34d399', soft: 'rgba(52,211,153,0.14)' },
   ai: { label: 'Intelligence', hint: 'IA & traitement du langage', color: '#e879f9', soft: 'rgba(232,121,249,0.14)' },
@@ -33,6 +35,11 @@ const CMP = {
     ],
   },
   conditionRight: { key: 'right', label: 'Valeur 2', type: 'text' as const, placeholder: '200' },
+};
+
+const VIDEO_URL = {
+  key: 'videoUrl', label: 'URL de la vidéo', type: 'text' as const, default: '{{ $json.video }}',
+  placeholder: 'https://…/clip.mp4', hint: 'Lien direct vers le fichier (mp4, mov, webm…)',
 };
 
 export const NODE_DEFS: NodeDef[] = [
@@ -175,6 +182,123 @@ export const NODE_DEFS: NodeDef[] = [
       { key: 'titleProperty', label: 'Propriété titre', type: 'text', default: 'Name', hint: 'Nom de la propriété « Titre » de la base' },
       { key: 'title', label: 'Titre de la page', type: 'text', default: '{{ $json.client ?? "Nouveau contact" }}' },
       { key: 'content', label: 'Contenu', type: 'textarea', default: 'Créé automatiquement par Fluxia.' },
+    ],
+  },
+
+  // ───────────────────────── VIDÉO ─────────────────────────
+  {
+    type: 'videoYoutube', label: 'YouTube', category: 'video', icon: MonitorPlay,
+    description: 'Télécharge la vidéo et l’envoie réellement sur YouTube (relais + jeton OAuth).',
+    inputs: 1, outputs: ['Sortie'],
+    params: [
+      VIDEO_URL,
+      { key: 'accessToken', label: 'Jeton d’accès OAuth', type: 'text', default: '', placeholder: 'ya29.…', hint: 'Scope youtube.upload — voir OAuth Playground pour un test' },
+      { key: 'title', label: 'Titre', type: 'text', default: '{{ $json.titre ?? "Ma vidéo" }}' },
+      { key: 'description', label: 'Description', type: 'textarea', default: '' },
+      { key: 'tags', label: 'Tags', type: 'text', default: '', placeholder: 'tuto, automation, fluxia', hint: 'Séparés par des virgules' },
+      {
+        key: 'categoryId', label: 'Catégorie', type: 'select', default: '22',
+        options: [
+          { label: 'People & Blogs', value: '22' }, { label: 'Divertissement', value: '24' },
+          { label: 'Éducation', value: '27' }, { label: 'Science & Tech', value: '28' },
+          { label: 'Musique', value: '10' }, { label: 'Jeux vidéo', value: '20' },
+        ],
+      },
+      {
+        key: 'privacy', label: 'Visibilité', type: 'select', default: 'private',
+        options: [
+          { label: 'Privée', value: 'private' }, { label: 'Non répertoriée', value: 'unlisted' }, { label: 'Publique', value: 'public' },
+        ],
+      },
+      { key: 'madeForKids', label: 'Conçue pour les enfants', type: 'boolean', default: false },
+    ],
+  },
+  {
+    type: 'videoMastodon', label: 'Mastodon', category: 'video', icon: AtSign,
+    description: 'Publie une vraie vidéo sur l’instance de votre choix (MP4/MOV/WebM, jeton write:media + write:statuses).',
+    inputs: 1, outputs: ['Sortie'],
+    params: [
+      VIDEO_URL,
+      { key: 'instance', label: 'Instance', type: 'text', default: 'mastodon.social', placeholder: 'mastodon.social', hint: 'Domaine seul, sans https' },
+      { key: 'accessToken', label: 'Jeton d’accès', type: 'text', default: '', placeholder: 'AAAA…', hint: 'Préférences → Développement → « Generer un jeton » (write:media, write:statuses)' },
+      { key: 'text', label: 'Message', type: 'textarea', default: '{{ $json.texte ?? "" }}' },
+      { key: 'altText', label: 'Texte alternatif vidéo', type: 'text', default: '', hint: 'Description pour les lecteurs d’écran (optionnel)' },
+      {
+        key: 'visibility', label: 'Visibilité', type: 'select', default: 'public',
+        options: [
+          { label: 'Publique', value: 'public' }, { label: 'Non listée', value: 'unlisted' },
+          { label: 'Abonnés', value: 'private' }, { label: 'Direct', value: 'direct' },
+        ],
+      },
+    ],
+  },
+  {
+    type: 'videoBluesky', label: 'Bluesky', category: 'video', icon: Feather,
+    description: 'Poste réellement une vidéo sur Bluesky — MP4 uniquement, mot de passe d’application requis.',
+    inputs: 1, outputs: ['Sortie'],
+    params: [
+      VIDEO_URL,
+      { key: 'pds', label: 'Hébergeur', type: 'text', default: 'bsky.social', hint: 'bsky.social par défaut, ou le domaine de votre PDS' },
+      { key: 'identifier', label: 'Identifiant', type: 'text', default: '', placeholder: 'pseudo.bsky.social' },
+      { key: 'appPassword', label: 'Mot de passe d’application', type: 'text', default: '', hint: 'Paramètres → Sécurité → Mots de passe d’application' },
+      { key: 'text', label: 'Message', type: 'textarea', default: '{{ $json.texte ?? "" }}' },
+      { key: 'altText', label: 'Texte alternatif vidéo', type: 'text', default: '', hint: 'Description pour les lecteurs d’écran (optionnel)' },
+    ],
+  },
+  {
+    type: 'videoX', label: 'X (Twitter)', category: 'video', icon: MessagesSquare,
+    description: 'Envoie réellement la vidéo par tranches puis publie le post (relais local).',
+    inputs: 1, outputs: ['Sortie'],
+    params: [
+      VIDEO_URL,
+      { key: 'accessToken', label: 'User access token', type: 'text', default: '', hint: 'developer.x.com → projet → scopes media.write + tweet.write' },
+      { key: 'text', label: 'Post', type: 'textarea', default: '{{ $json.texte ?? "" }}' },
+    ],
+  },
+  {
+    type: 'videoInstagram', label: 'Instagram Reels', category: 'video', icon: Camera,
+    description: 'Publie un Reel réel via la Graph API (compte pro + app Meta approuvée).',
+    inputs: 1, outputs: ['Sortie'],
+    params: [
+      VIDEO_URL,
+      { key: 'igUserId', label: 'ID du compte Instagram', type: 'text', default: '', hint: 'Graph API Explorer → Instagram Business Account' },
+      { key: 'accessToken', label: 'Jeton d’accès Meta', type: 'text', default: '', hint: 'instagram_content_publish + pages_read_engagement' },
+      { key: 'caption', label: 'Légende', type: 'textarea', default: '{{ $json.texte ?? "" }}' },
+      { key: 'shareToFeed', label: 'Partager aussi dans le fil', type: 'boolean', default: true },
+    ],
+  },
+  {
+    type: 'videoFacebook', label: 'Facebook Page', category: 'video', icon: ThumbsUp,
+    description: 'Met réellement une vidéo en ligne sur une Page (jeton Page + publish_video).',
+    inputs: 1, outputs: ['Sortie'],
+    params: [
+      VIDEO_URL,
+      { key: 'pageId', label: 'ID de la Page', type: 'text', default: '', hint: 'Page → À propos → Identifiant de la Page' },
+      { key: 'accessToken', label: 'Jeton d’accès de la Page', type: 'text', default: '', hint: 'publish_video + pages_manage_metadata' },
+      { key: 'title', label: 'Titre', type: 'text', default: '{{ $json.titre ?? "Ma vidéo" }}' },
+      { key: 'description', label: 'Description', type: 'textarea', default: '' },
+    ],
+  },
+  {
+    type: 'videoTiktok', label: 'TikTok', category: 'video', icon: Music2,
+    description: 'Demande réellement une publication via la Content Posting API (app approuvée).',
+    inputs: 1, outputs: ['Sortie'],
+    params: [
+      VIDEO_URL,
+      { key: 'accessToken', label: 'Jeton d’accès', type: 'text', default: '', hint: 'developers.tiktok.com → scope video.publish' },
+      { key: 'title', label: 'Titre / description', type: 'textarea', default: '{{ $json.texte ?? "" }}' },
+      {
+        key: 'privacy', label: 'Visibilité', type: 'select', default: 'SELF_ONLY',
+        options: [
+          { label: 'Moi uniquement', value: 'SELF_ONLY' }, { label: 'Abonnés croisés', value: 'MUTUAL_FOLLOW' },
+          { label: 'Mes abonnés', value: 'FOLLOWER' }, { label: 'Public', value: 'PUBLIC_TO_EVERYONE' },
+        ],
+        hint: '« Public » exige une app auditée par TikTok',
+      },
+      { key: 'coverUrl', label: 'URL de la miniature', type: 'text', default: '', hint: 'Optionnel — image publique' },
+      { key: 'allowComments', label: 'Commentaires autorisés', type: 'boolean', default: true },
+      { key: 'allowDuet', label: 'Duettes autorisées', type: 'boolean', default: false },
+      { key: 'allowStitch', label: 'Stitch autorisé', type: 'boolean', default: false },
     ],
   },
 
@@ -434,4 +558,4 @@ export function defaultParams(type: string): Record<string, unknown> {
   return out;
 }
 
-export const CATEGORY_ORDER: NodeCategory[] = ['trigger', 'action', 'logic', 'data', 'ai', 'note'];
+export const CATEGORY_ORDER: NodeCategory[] = ['trigger', 'action', 'video', 'logic', 'data', 'ai', 'note'];

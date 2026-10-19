@@ -14,7 +14,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        advancedChunks: {
+        codeSplitting: {
           groups: [
             { name: 'react-vendor', test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/ },
             { name: 'flow-vendor', test: /node_modules[\\/]@xyflow[\\/]/ },

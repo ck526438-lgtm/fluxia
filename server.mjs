@@ -15,6 +15,10 @@ const PORT = Number(process.env.PORT || 5174);
 const HOST = '127.0.0.1';
 const MAX_BODY = 5 * 1024 * 1024;
 const FETCH_TIMEOUT = 30_000;
+const MAX_VIDEO = 200 * 1024 * 1024;
+const VIDEO_FETCH_TIMEOUT = 180_000;
+const UPLOAD_TIMEOUT = 300_000;
+const VIDEO_TTL = 15 * 60 * 1000;
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -51,9 +55,9 @@ function sendJson(res, status, payload) {
   res.end(body);
 }
 
-async function forward(url, { method = 'GET', headers = {}, body } = {}) {
+async function forward(url, { method = 'GET', headers = {}, body, timeout = FETCH_TIMEOUT } = {}) {
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT);
+  const timer = setTimeout(() => ctrl.abort(), timeout);
   try {
     const res = await fetch(url, { method, headers, body, signal: ctrl.signal });
     return { status: res.status, contentType: res.headers.get('content-type') ?? '', body: await res.text() };
@@ -100,11 +104,96 @@ async function googleAccessToken(clientEmail, privateKey) {
   return json.access_token;
 }
 
+// ─── Vidéos : le relais récupère les octets puis les ré-expédie ───
+// Un navigateur ne peut pas lire le contenu d'une URL vidéo arbitraire (CORS), et les
+// API des réseaux l'acceptent encore moins : c'est donc ici que ça se passe.
+
+const videoCache = new Map();
+
+function videoCleanup() {
+  const now = Date.now();
+  for (const [id, v] of videoCache) if (v.expiresAt < now) videoCache.delete(id);
+}
+setInterval(videoCleanup, 60_000).unref();
+
+function cachedVideo(id) {
+  const v = videoCache.get(String(id));
+  if (!v || v.expiresAt < Date.now()) {
+    videoCache.delete(String(id));
+    throw new Error('Vidéo expirée côté relais — relancez l’exécution du nœud.');
+  }
+  v.expiresAt = Date.now() + VIDEO_TTL;
+  return v;
+}
+
+function filenameFromUrl(url) {
+  try {
+    const name = decodeURIComponent(new URL(url).pathname.split('/').filter(Boolean).pop() ?? '');
+    return /^[\w. ()[-]{1,80}\.(mp4|mov|m4v|webm|avi|mkv|gif)$/i.test(name) ? name : 'video.mp4';
+  } catch {
+    return 'video.mp4';
+  }
+}
+
+async function videoFetch(url) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), VIDEO_FETCH_TIMEOUT);
+  try {
+    const res = await fetch(url, { signal: ctrl.signal, redirect: 'follow' });
+    if (!res.ok) throw new Error(`HTTP ${res.status} sur l’URL de la vidéo — vérifiez qu’elle est bien publique.`);
+    const declared = Number(res.headers.get('content-length') ?? 0);
+    if (declared > MAX_VIDEO) {
+      throw new Error(`Vidéo trop lourde pour le relais : ${(declared / 1048576).toFixed(0)} Mo (max ${MAX_VIDEO / 1048576} Mo).`);
+    }
+    const bytes = Buffer.from(await res.arrayBuffer());
+    if (!bytes.length) throw new Error('La vidéo téléchargée fait 0 octet — l’URL ne pointe pas vers un fichier lisible.');
+    const type = (res.headers.get('content-type') ?? '').split(';')[0] || 'video/mp4';
+    // Garde-fou : une URL erronée renvoie souvent une page d'erreur HTML (status 200 quand même).
+    if (type === 'text/html' || type === 'text/plain') {
+      throw new Error(`L’URL ne renvoie pas une vidéo mais du ${type} — vérifiez le lien (il doit pointer directement sur le fichier .mp4/.mov/.webm…).`);
+    }
+    if (bytes.length > MAX_VIDEO) {
+      throw new Error(`Vidéo trop lourde pour le relais : ${(bytes.length / 1048576).toFixed(0)} Mo (max ${MAX_VIDEO / 1048576} Mo).`);
+    }
+    videoCleanup();
+    let held = 0;
+    for (const v of videoCache.values()) held += v.bytes.length;
+    if (held + bytes.length > MAX_VIDEO * 2) videoCache.clear();
+    const entry = {
+      bytes,
+      contentType: type,
+      filename: filenameFromUrl(url),
+      expiresAt: Date.now() + VIDEO_TTL,
+    };
+    const id = crypto.randomUUID();
+    videoCache.set(id, entry);
+    return { id, size: bytes.length, contentType: type, filename: entry.filename };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function multipartBody(boundary, fields, file) {
+  const parts = [];
+  for (const [name, value] of Object.entries(fields ?? {})) {
+    if (value === undefined || value === null) continue;
+    parts.push(Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="${name}"\r\n\r\n${value}\r\n`));
+  }
+  if (file) {
+    parts.push(Buffer.from(
+      `--${boundary}\r\nContent-Disposition: form-data; name="${file.field}"; filename="${file.filename}"\r\nContent-Type: ${file.type}\r\n\r\n`,
+    ));
+    parts.push(file.data, Buffer.from('\r\n'));
+  }
+  parts.push(Buffer.from(`--${boundary}--\r\n`));
+  return Buffer.concat(parts);
+}
+
 async function handleApi(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
   if (req.method === 'GET' && url.pathname === '/api/health') {
-    return sendJson(res, 200, { ok: true, service: 'fluxia-relais', version: 1 });
+    return sendJson(res, 200, { ok: true, service: 'fluxia-relais', version: 2, video: true });
   }
 
   if (req.method === 'POST' && url.pathname === '/api/relay') {
@@ -160,6 +249,133 @@ async function handleApi(req, res) {
     }
   }
 
+  if (req.method === 'POST' && url.pathname === '/api/video/fetch') {
+    let payload;
+    try {
+      payload = JSON.parse(await readBody(req));
+    } catch (e) {
+      return sendJson(res, 400, { error: e instanceof Error ? e.message : 'JSON invalide' });
+    }
+    const target = String(payload?.url ?? '');
+    if (!/^https?:\/\//i.test(target)) return sendJson(res, 200, { ok: false, error: 'URL de vidéo invalide — http(s) requis.' });
+    try {
+      return sendJson(res, 200, { ok: true, ...(await videoFetch(target)) });
+    } catch (e) {
+      return sendJson(res, 200, { ok: false, error: e instanceof Error ? e.message : 'téléchargement impossible' });
+    }
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/video/multipart') {
+    let payload;
+    try {
+      payload = JSON.parse(await readBody(req));
+    } catch (e) {
+      return sendJson(res, 400, { error: e instanceof Error ? e.message : 'JSON invalide' });
+    }
+    const target = String(payload?.url ?? '');
+    if (!/^https?:\/\//i.test(target)) return sendJson(res, 200, { status: 0, body: 'URL cible invalide.' });
+    try {
+      const v = cachedVideo(payload?.id);
+      // Tranche optionnelle : X envoie la vidéo segment par segment en multipart.
+      let bytes = v.bytes;
+      if (payload?.start !== undefined || payload?.end !== undefined) {
+        const from = Math.max(0, Number(payload?.start ?? 0));
+        const to = Math.min(v.bytes.length - 1, Number(payload?.end ?? v.bytes.length - 1));
+        if (from > to) return sendJson(res, 200, { status: 0, body: 'Plage de tranches invalide.' });
+        bytes = v.bytes.subarray(from, to + 1);
+      }
+      const boundary = `----Fluxia${crypto.randomBytes(12).toString('hex')}`;
+      const body = multipartBody(boundary, payload?.fields, {
+        field: String(payload?.fileField ?? 'file'),
+        filename: String(payload?.fileName ?? v.filename),
+        type: String(payload?.fileType ?? v.contentType),
+        data: bytes,
+      });
+      const out = await forward(target, {
+        method: String(payload?.method ?? 'POST').toUpperCase(),
+        headers: { ...(payload?.headers ?? {}), 'Content-Type': `multipart/form-data; boundary=${boundary}` },
+        body,
+        timeout: UPLOAD_TIMEOUT,
+      });
+      return sendJson(res, 200, out);
+    } catch (e) {
+      return sendJson(res, 200, { status: 0, body: e instanceof Error ? e.message : 'échec upload' });
+    }
+  }
+
+  // YouTube n'accepte pas du form-data : il veut un `multipart/related` dont la première
+  // partie est le corps JSON et la seconde les octets de la vidéo.
+  if (req.method === 'POST' && url.pathname === '/api/video/related') {
+    let payload;
+    try {
+      payload = JSON.parse(await readBody(req));
+    } catch (e) {
+      return sendJson(res, 400, { error: e instanceof Error ? e.message : 'JSON invalide' });
+    }
+    const target = String(payload?.url ?? '');
+    if (!/^https?:\/\//i.test(target)) return sendJson(res, 200, { status: 0, body: 'URL cible invalide.' });
+    try {
+      const v = cachedVideo(payload?.id);
+      const boundary = `----Fluxia${crypto.randomBytes(12).toString('hex')}`;
+      const head = Buffer.concat(
+        (Array.isArray(payload?.parts) ? payload.parts : []).map((p) => Buffer.from(
+          `--${boundary}\r\nContent-Type: ${String(p?.contentType ?? 'application/json')}\r\n\r\n${String(p?.body ?? '')}\r\n`,
+        )),
+      );
+      const fileHeader = Buffer.from(`--${boundary}\r\nContent-Type: ${String(payload?.fileType ?? v.contentType)}\r\n\r\n`);
+      const body = Buffer.concat([head, fileHeader, v.bytes, Buffer.from(`\r\n--${boundary}--\r\n`)]);
+      const out = await forward(target, {
+        method: String(payload?.method ?? 'POST').toUpperCase(),
+        headers: { ...(payload?.headers ?? {}), 'Content-Type': `multipart/related; boundary=${boundary}` },
+        body,
+        timeout: UPLOAD_TIMEOUT,
+      });
+      return sendJson(res, 200, out);
+    } catch (e) {
+      return sendJson(res, 200, { status: 0, body: e instanceof Error ? e.message : 'échec upload' });
+    }
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/video/chunk') {
+    let payload;
+    try {
+      payload = JSON.parse(await readBody(req));
+    } catch (e) {
+      return sendJson(res, 400, { error: e instanceof Error ? e.message : 'JSON invalide' });
+    }
+    const target = String(payload?.url ?? '');
+    if (!/^https?:\/\//i.test(target)) return sendJson(res, 200, { status: 0, body: 'URL cible invalide.' });
+    try {
+      const v = cachedVideo(payload?.id);
+      const total = v.bytes.length;
+      const from = Math.max(0, Number(payload?.start ?? 0));
+      const to = Math.min(total - 1, Number(payload?.end ?? total - 1));
+      if (from > to) return sendJson(res, 200, { status: 0, body: 'Plage de tranches invalide.' });
+      const headers = { ...(payload?.headers ?? {}) };
+      if (payload?.contentRange !== false) headers['Content-Range'] = `bytes ${from}-${to}/${total}`;
+      const out = await forward(target, {
+        method: String(payload?.method ?? 'PUT').toUpperCase(),
+        headers,
+        body: v.bytes.subarray(from, to + 1),
+        timeout: UPLOAD_TIMEOUT,
+      });
+      return sendJson(res, 200, out);
+    } catch (e) {
+      return sendJson(res, 200, { status: 0, body: e instanceof Error ? e.message : 'échec upload' });
+    }
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/video/release') {
+    let payload;
+    try {
+      payload = JSON.parse(await readBody(req));
+    } catch {
+      payload = {};
+    }
+    videoCache.delete(String(payload?.id ?? ''));
+    return sendJson(res, 200, { ok: true });
+  }
+
   return sendJson(res, 404, { error: 'Route inconnue' });
 }
 
@@ -207,5 +423,6 @@ server.listen(PORT, HOST, () => {
   console.log(`⚡ Fluxia relais local sur http://${HOST}:${PORT}`);
   console.log('   /api/relay         → transfère les appels bloqués par CORS (Slack, etc.)');
   console.log('   /api/sheets-append → Google Sheets via compte de service');
+  console.log('   /api/video/*       → récupère une vidéo par URL et l’upload (YouTube, X, Mastodon, Bluesky…)');
   console.log('   dist/ servi en statique (lancez « npm run build » pour la prod)');
 });
