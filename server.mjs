@@ -1,4 +1,4 @@
-// Fluxia — relais local optionnel.
+// FormatPro3 Workflow — relais local optionnel.
 // Débloque les API qui refusent les appels navigateur (CORS) : Slack, Google Sheets, etc.
 // Lancement : npm start  (ou PORT=5174 node server.mjs)
 // Écoute uniquement sur 127.0.0.1 — aucun port exposé sur le réseau.
@@ -193,7 +193,7 @@ async function handleApi(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
 
   if (req.method === 'GET' && url.pathname === '/api/health') {
-    return sendJson(res, 200, { ok: true, service: 'fluxia-relais', version: 2, video: true });
+    return sendJson(res, 200, { ok: true, service: 'formatpro3-relais', version: 2, video: true });
   }
 
   if (req.method === 'POST' && url.pathname === '/api/relay') {
@@ -284,7 +284,7 @@ async function handleApi(req, res) {
         if (from > to) return sendJson(res, 200, { status: 0, body: 'Plage de tranches invalide.' });
         bytes = v.bytes.subarray(from, to + 1);
       }
-      const boundary = `----Fluxia${crypto.randomBytes(12).toString('hex')}`;
+      const boundary = `----FormatPro3${crypto.randomBytes(12).toString('hex')}`;
       const body = multipartBody(boundary, payload?.fields, {
         field: String(payload?.fileField ?? 'file'),
         filename: String(payload?.fileName ?? v.filename),
@@ -316,7 +316,7 @@ async function handleApi(req, res) {
     if (!/^https?:\/\//i.test(target)) return sendJson(res, 200, { status: 0, body: 'URL cible invalide.' });
     try {
       const v = cachedVideo(payload?.id);
-      const boundary = `----Fluxia${crypto.randomBytes(12).toString('hex')}`;
+      const boundary = `----FormatPro3${crypto.randomBytes(12).toString('hex')}`;
       const head = Buffer.concat(
         (Array.isArray(payload?.parts) ? payload.parts : []).map((p) => Buffer.from(
           `--${boundary}\r\nContent-Type: ${String(p?.contentType ?? 'application/json')}\r\n\r\n${String(p?.body ?? '')}\r\n`,
@@ -420,7 +420,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`⚡ Fluxia relais local sur http://${HOST}:${PORT}`);
+  console.log(`⚡ FormatPro3 Workflow relais local sur http://${HOST}:${PORT}`);
   console.log('   /api/relay         → transfère les appels bloqués par CORS (Slack, etc.)');
   console.log('   /api/sheets-append → Google Sheets via compte de service');
   console.log('   /api/video/*       → récupère une vidéo par URL et l’upload (YouTube, X, Mastodon, Bluesky…)');

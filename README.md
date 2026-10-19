@@ -1,6 +1,8 @@
-# ⚡ Fluxia — Automatisation visuelle de workflows
+<img src="src/assets/logo-formatpro3.png" alt="FormatPro3" width="300" />
 
-Fluxia est un éditeur de workflows par nœuds, inspiré de n8n : on construit un flux en
+# FormatPro3 Workflow — Automatisation visuelle de workflows
+
+**FormatPro3 Workflow** est un éditeur de workflows par nœuds, inspiré de n8n : on construit un flux en
 reliant des nœuds sur un canvas, on configure chaque étape à droite, on exécute, et on
 regarde les données circuler de nœud en nœud en temps réel.
 
@@ -12,7 +14,7 @@ Instagram Reels, Facebook Page et TikTok — depuis une simple URL.
 
 [![CI](https://github.com/ck526438-lgtm/fluxia/actions/workflows/ci.yml/badge.svg)](https://github.com/ck526438-lgtm/fluxia/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/Licence-MIT-3f6ad8)](LICENSE) ![Stack](https://img.shields.io/badge/React-19-61dafb) ![Vite](https://img.shields.io/badge/Vite-8-646cff) ![TS](https://img.shields.io/badge/TypeScript-5-3178c6)
 
-![Fluxia — canvas de workflow avec nœuds connectés](docs/screenshot.png)
+![FormatPro3 Workflow — canvas de workflow avec nœuds connectés](docs/screenshot.png)
 
 **🌐 Démo en ligne : [ck526438-lgtm.github.io/fluxia](https://ck526438-lgtm.github.io/fluxia/)** —
 redéployée automatiquement à chaque push. Version 100 % navigateur : le relais local
@@ -25,6 +27,11 @@ paramètre**, où obtenir chaque clé API, publication vidéo (endpoints, limite
 relais local, 6 modèles, raccourcis, tableau de dépannage et bonnes pratiques de sécurité.
 Source imprimable : [docs/guide-utilisation.html](docs/guide-utilisation.html)
 (`msedge --headless --print-to-pdf=docs/guide-utilisation.pdf docs/guide-utilisation.html` pour le régénérer).
+
+> **Nom** : le produit s'appelle **FormatPro3 Workflow** (logo : `src/assets/logo-formatpro3.png`,
+> marque : `src/assets/logo-mark.png`, aussi favicon). Le dépôt et l'URL de la démo portent
+> encore l'ancien nom `fluxia` — c'est uniquement l'adresse technique ; renommer le dépôt
+> changerait `ck526438-lgtm.github.io/fluxia` en `…/formatpro3-workflow`.
 
 ## Démarrage
 
@@ -106,12 +113,12 @@ partout avec `{{ $creds.nom }}` — plus besoin de les ressaisir dans chaque nœ
 ### Publier une vidéo sur les réseaux (catégorie Vidéo)
 
 Sept nœuds qui déposent réellement une vidéo sur les plateformes. Le contrat d'API est
-différent partout ; Fluxia parle à chaque API officielle, avec le relais local pour les
+différent partout ; FormatPro3 Workflow parle à chaque API officielle, avec le relais local pour les
 octets :
 
 | Nœud | Ce qui est réellement appelé | Ce qu'il faut | Ce que la plateforme impose |
 | --- | --- | --- | --- |
-| `YouTube` | `POST upload/youtube/v3/videos` en `multipart` (chunk JSON + octets) | Jeton OAuth 2.0 avec le scope `youtube.upload` — une clé API seule ne suffit pas, les comptes de service sont refusés | 100 mises en ligne / jour ; `privacyStatus` par défaut privée chez Fluxia |
+| `YouTube` | `POST upload/youtube/v3/videos` en `multipart` (chunk JSON + octets) | Jeton OAuth 2.0 avec le scope `youtube.upload` — une clé API seule ne suffit pas, les comptes de service sont refusés | 100 mises en ligne / jour ; `privacyStatus` par défaut privée chez FormatPro3 Workflow |
 | `Mastodon` | `POST /api/v2/media` puis **polling** `GET /api/v1/media/:id` jusqu'à l'encodage, `POST /api/v1/statuses` avec `media_ids[]` | Jeton personnel de l'instance (Préférences → Développement), scopes `write:media` + `write:statuses` | Limites lues sur `/api/v2/instance` avant l'envoi (MP4/MOV/WebM, 99 Mio par défaut, une seule vidéo par post) ; 30 envois / 30 min |
 | `Bluesky` | `createSession` → `com.atproto.repo.uploadBlob` (octets bruts, sur le **PDS du compte**) → `com.atproto.repo.createRecord` avec `app.bsky.embed.video` | Mot de passe d'application (jamais le mot de passe principal) | MP4 uniquement — le MIME renvoyé par le PDS est vérifié avant publication ; 300 Mio / 10 min sur bsky.social, **5 Mio par défaut sur un PDS auto-hébergé**. Voie simple (fichier déposé tel quel, sans repasser par le service de transcodage de Bluesky) |
 | `X (Twitter)` | Protocole v2 : `initialize` → `append` **par segments de 5 Mo** → `finalize` → `STATUS` jusqu'à `succeeded` → `POST /2/tweets` | User access token OAuth 2.0 (`media.write` + `tweet.write`) ; un Bearer applicatif est rejeté | Découpage et attente de transcodage gérés automatiquement ; relais obligatoire (pas de CORS) |
@@ -162,6 +169,9 @@ docs/
 ├── guide-utilisation.html  # Sa source imprimable (rendu Edge/Chrome --print-to-pdf)
 └── screenshot.png          # Capture du canvas affichée en haut de ce README
 src/
+├── assets/
+│   ├── logo-formatpro3.png  # Marque horizontale (état vide du canvas, README, guide PDF)
+│   └── logo-mark.png        # Sigle « 3 » — favicon + barre d'outils
 ├── types.ts                 # Types partagés (nœud, item, exécution…)
 ├── data/
 │   ├── catalog.tsx          # Définition des 44 nœuds (icône, couleur, params, ports)

@@ -2,21 +2,23 @@ import { useRef } from 'react';
 import { motion } from 'motion/react';
 import clsx from 'clsx';
 import {
-  Check, Command, Download, Gauge, KeyRound, LayoutTemplate, Loader2, Play, Redo2, Sparkles, Square, Undo2, Upload, Zap,
+  Check, Command, Download, Gauge, KeyRound, LayoutTemplate, Loader2, Play, Redo2, Sparkles, Square, Undo2, Upload,
 } from 'lucide-react';
 import { useFlow } from '../store/store';
+import logoMark from '../assets/logo-mark.png';
 
 function LogoMark() {
   return (
-    <motion.div
+    <motion.img
+      src={logoMark}
+      alt=""
+      width={34}
+      height={34}
       initial={{ rotate: -12, scale: 0.8, opacity: 0 }}
       animate={{ rotate: 0, scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 320, damping: 22, delay: 0.05 }}
-      className="relative flex h-8 w-8 items-center justify-center rounded-[10px] bg-gradient-to-br from-violet-500 via-fuchsia-500 to-rose-500 shadow-[0_6px_20px_-6px_rgba(168,85,247,0.9)]"
-    >
-      <Zap size={16} className="text-white" strokeWidth={2.6} fill="rgba(255,255,255,0.35)" />
-      <span className="absolute inset-0 rounded-[10px] ring-1 ring-inset ring-white/25" />
-    </motion.div>
+      className="h-[34px] w-[34px] shrink-0 object-contain drop-shadow-[0_4px_14px_rgba(56,120,255,0.45)]"
+    />
   );
 }
 
@@ -83,8 +85,10 @@ export function TopBar() {
       <div className="flex items-center gap-2.5">
         <LogoMark />
         <div className="leading-none">
-          <div className="text-[13.5px] font-extrabold tracking-tight text-white/95">Fluxia</div>
-          <div className="mt-1 hidden text-[8.5px] font-semibold uppercase tracking-[0.18em] text-white/30 xl:block">Workflow automation</div>
+          <div className="text-[14px] font-extrabold tracking-tight text-white/95">
+            FormatPro3<span className="text-sky-400/90">&nbsp;Workflow</span>
+          </div>
+          <div className="mt-1 hidden text-[8.5px] font-semibold uppercase tracking-[0.18em] text-white/30 xl:block">Automatisation visuelle de flux</div>
         </div>
       </div>
 

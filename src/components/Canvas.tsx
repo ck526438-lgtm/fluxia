@@ -4,7 +4,7 @@ import {
   type Node,
 } from '@xyflow/react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ChevronRight, Clock, ListChecks, MousePointerClick, PanelLeft, Webhook, ZoomIn } from 'lucide-react';
+import { ChevronRight, Clock, MousePointerClick, PanelLeft, Webhook, ZoomIn } from 'lucide-react';
 import { CATEGORIES, getDef } from '../data/catalog';
 import { useFlow } from '../store/store';
 import { FlowNode } from './FlowNode';
@@ -12,6 +12,7 @@ import { FlowEdge } from './FlowEdge';
 import { StickyNote } from './StickyNote';
 import { ContextMenu, type ContextTarget } from './ContextMenu';
 import { ExecutionPanel } from './ExecutionPanel';
+import logoWordmark from '../assets/logo-formatpro3.png';
 
 const nodeTypes = { flux: FlowNode, note: StickyNote };
 const edgeTypes = { flux: FlowEdge };
@@ -38,10 +39,12 @@ function EmptyState() {
       className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-6"
     >
       <div className="glass pointer-events-auto w-[460px] rounded-2xl border p-6 text-center shadow-2xl">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/25 to-fuchsia-500/15 ring-1 ring-inset ring-violet-400/30">
-          <ListChecks size={22} className="text-violet-300" />
-        </div>
-        <h2 className="mt-3.5 text-[16px] font-bold text-white/92">Créez votre premier flux</h2>
+        <img
+          src={logoWordmark}
+          alt="FormatPro3"
+          className="mx-auto h-11 w-auto object-contain drop-shadow-[0_6px_22px_rgba(56,120,255,0.35)]"
+        />
+        <h2 className="mt-3 text-[16px] font-bold text-white/92">Créez votre premier flux</h2>
         <p className="mx-auto mt-1.5 max-w-[340px] text-[12px] leading-relaxed text-white/45">
           Tout flux démarre par un déclencheur. Choisissez-en un, puis enchaînez les actions sur le canvas.
         </p>

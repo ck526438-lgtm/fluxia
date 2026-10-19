@@ -14,7 +14,7 @@ export function hasRelay(): Promise<boolean> {
 }
 
 export const NO_RELAY =
-  'Publication impossible : le navigateur bloque l’appel (CORS). Lancez le relais local — « npm start » dans le dossier Fluxia — puis relancez le flux.';
+  'Publication impossible : le navigateur bloque l’appel (CORS). Lancez le relais local — « npm start » Ã  la racine du projet — puis relancez le flux.';
 
 async function relayJson<T>(path: string, payload: unknown): Promise<T> {
   const res = await fetch(path, {
@@ -114,7 +114,7 @@ export function videoRelease(id: string): void {
 // Erreur lisible : le relais répond « Route inconnue » s'il tourne en version antérieure.
 export function relayVersionError(r: RelayResult, feature: string): Error | null {
   if (r.status === 404 && /route inconnue/i.test(r.body)) {
-    return new Error(`Relais trop ancien pour ${feature} — relancez « npm start » dans le dossier Fluxia.`);
+    return new Error(`Relais trop ancien pour ${feature} — relancez « npm start » Ã  la racine du projet.`);
   }
   return null;
 }

@@ -445,7 +445,7 @@ export const useFlow = create<FlowState>((set, get) => ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${name.replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').toLowerCase() || 'flux'}.fluxia.json`;
+    a.download = `${name.replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').toLowerCase() || 'flux'}.formatpro3.json`;
     a.click();
     URL.revokeObjectURL(url);
     get().pushToast('success', 'Flux exporté', `${nodes.length} nœuds sauvegardés`);

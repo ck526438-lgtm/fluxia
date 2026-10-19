@@ -383,7 +383,7 @@ async function netFetch(url: string, init: { method?: string; headers?: Record<s
   } catch (e) {
     if ((e as Error).name === 'TimeoutError') throw new Error('Délai dépassé en appelant le réseau (30 s).');
     if (await hasRelay()) return relayFetch(url, init);
-    throw new Error('Réseau injoignable depuis le navigateur et le relais local est arrêté — lancez « npm start » dans le dossier Fluxia.');
+    throw new Error('Réseau injoignable depuis le navigateur et le relais local est arrêté — lancez « npm start » Ã  la racine du projet.');
   }
 }
 

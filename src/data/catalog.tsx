@@ -108,7 +108,7 @@ export const NODE_DEFS: NodeDef[] = [
       { key: 'from', label: 'Expéditeur', type: 'text', default: '', placeholder: 'vous@votre-domaine.fr', hint: 'Adresse validée dans Brevo' },
       { key: 'to', label: 'Destinataire', type: 'text', default: '{{ $json.email }}' },
       { key: 'subject', label: 'Sujet', type: 'text', default: 'Rapport automatique — {{ $now.toLocaleDateString("fr-FR") }}' },
-      { key: 'text', label: 'Message', type: 'textarea', default: 'Bonjour,\n\nLe flux a produit {{ $json.ville }}.\n\nCordialement,\nFluxia' },
+      { key: 'text', label: 'Message', type: 'textarea', default: 'Bonjour,\n\nLe flux a produit {{ $json.ville }}.\n\nCordialement,\nFormatPro3' },
     ],
   },
   {
@@ -144,7 +144,7 @@ export const NODE_DEFS: NodeDef[] = [
     description: 'Convertit les éléments reçus en fichier CSV et le télécharge.',
     inputs: 1, outputs: ['Sortie'],
     params: [
-      { key: 'filename', label: 'Nom du fichier', type: 'text', default: 'export-fluxia.csv' },
+      { key: 'filename', label: 'Nom du fichier', type: 'text', default: 'export-formatpro3.csv' },
       {
         key: 'separator', label: 'Séparateur', type: 'select', default: ';',
         options: [{ label: '; (Excel FR)', value: ';' }, { label: ', (standard)', value: ',' }],
@@ -156,7 +156,7 @@ export const NODE_DEFS: NodeDef[] = [
     description: 'Affiche une notification système du navigateur.',
     inputs: 1, outputs: ['Sortie'],
     params: [
-      { key: 'title', label: 'Titre', type: 'text', default: 'Fluxia — flux terminé' },
+      { key: 'title', label: 'Titre', type: 'text', default: 'FormatPro3 — flux terminé' },
       { key: 'body', label: 'Message', type: 'textarea', default: 'Traitement de {{ $items.length }} élément(s) terminé ✅' },
     ],
   },
@@ -165,7 +165,7 @@ export const NODE_DEFS: NodeDef[] = [
     description: 'Ajoute une ligne réelle via un compte de service Google (relais local).',
     inputs: 1, outputs: ['Sortie'],
     params: [
-      { key: 'serviceAccountEmail', label: 'Email du compte de service', type: 'text', default: '', placeholder: 'fluxia@mon-projet.iam.gserviceaccount.com' },
+      { key: 'serviceAccountEmail', label: 'Email du compte de service', type: 'text', default: '', placeholder: 'formatpro3@mon-projet.iam.gserviceaccount.com' },
       { key: 'privateKey', label: 'Clé privée (private_key)', type: 'textarea', default: '', placeholder: '-----BEGIN PRIVATE KEY-----\n…\n-----END PRIVATE KEY-----\n' },
       { key: 'spreadsheetId', label: 'ID du classeur', type: 'text', default: '', placeholder: '1BxiMVs0XRA5nFMd… (URL du classeur)' },
       { key: 'range', label: 'Feuille et plage', type: 'text', default: 'Feuille 1!A1' },
@@ -181,7 +181,7 @@ export const NODE_DEFS: NodeDef[] = [
       { key: 'databaseId', label: 'ID de la base', type: 'text', default: '', placeholder: '32 caractères dans l’URL de la base' },
       { key: 'titleProperty', label: 'Propriété titre', type: 'text', default: 'Name', hint: 'Nom de la propriété « Titre » de la base' },
       { key: 'title', label: 'Titre de la page', type: 'text', default: '{{ $json.client ?? "Nouveau contact" }}' },
-      { key: 'content', label: 'Contenu', type: 'textarea', default: 'Créé automatiquement par Fluxia.' },
+      { key: 'content', label: 'Contenu', type: 'textarea', default: 'Créé automatiquement par FormatPro3.' },
     ],
   },
 
@@ -195,7 +195,7 @@ export const NODE_DEFS: NodeDef[] = [
       { key: 'accessToken', label: 'Jeton d’accès OAuth', type: 'text', default: '', placeholder: 'ya29.…', hint: 'Scope youtube.upload — voir OAuth Playground pour un test' },
       { key: 'title', label: 'Titre', type: 'text', default: '{{ $json.titre ?? "Ma vidéo" }}' },
       { key: 'description', label: 'Description', type: 'textarea', default: '' },
-      { key: 'tags', label: 'Tags', type: 'text', default: '', placeholder: 'tuto, automation, fluxia', hint: 'Séparés par des virgules' },
+      { key: 'tags', label: 'Tags', type: 'text', default: '', placeholder: 'tuto, automation, formatpro3', hint: 'Séparés par des virgules' },
       {
         key: 'categoryId', label: 'Catégorie', type: 'select', default: '22',
         options: [

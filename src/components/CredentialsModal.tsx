@@ -151,7 +151,7 @@ export function CredentialsModal() {
 
             <div className="flex items-center gap-2 border-t border-white/6 px-4 py-2.5 text-[10px] text-white/32">
               <Lock size={11} className="shrink-0" />
-              Stockés uniquement dans le localStorage de ce navigateur — jamais envoyés à un serveur Fluxia (ils partent uniquement vers les services que vous appelez).
+              Stockés uniquement dans le localStorage de ce navigateur — jamais envoyés à un serveur FormatPro3 (ils partent uniquement vers les services que vous appelez).
             </div>
           </motion.div>
         </motion.div>

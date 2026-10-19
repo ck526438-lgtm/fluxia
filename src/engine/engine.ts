@@ -268,7 +268,7 @@ async function runNodeCore(
             status = r.status;
             text = r.body;
           } else {
-            throw new Error('Requête bloquée par le navigateur (CORS ou réseau) : cette API n’autorise pas les appels directs. Lancez le relais local (« npm start » dans le dossier Fluxia) pour la débloquer.');
+            throw new Error('Requête bloquée par le navigateur (CORS ou réseau) : cette API n’autorise pas les appels directs. Lancez le relais local (« npm start » Ã  la racine du projet) pour la débloquer.');
           }
         }
         let data: unknown = text;
@@ -315,7 +315,7 @@ async function runNodeCore(
     }
     case 'slackMessage': {
       if (!(await hasRelay())) {
-        throw new Error('Slack bloque les appels directs du navigateur (CORS). Lancez le relais local : « npm start » dans le dossier Fluxia, puis relancez le flux.');
+        throw new Error('Slack bloque les appels directs du navigateur (CORS). Lancez le relais local : « npm start » Ã  la racine du projet, puis relancez le flux.');
       }
       const out: Item[] = [];
       for (let i = 0; i < input.length; i++) {
@@ -408,7 +408,7 @@ async function runNodeCore(
       let permission = Notification.permission;
       if (permission === 'default') permission = await Notification.requestPermission();
       if (permission !== 'granted') throw new Error('Notifications refusées — autorisez les notifications pour ce site dans les paramètres du navigateur.');
-      const title = String(resolved.title ?? 'Fluxia') || 'Fluxia';
+      const title = String(resolved.title ?? 'FormatPro3') || 'FormatPro3';
       const body = String(resolved.body ?? '');
       const notif = new Notification(title, { body });
       notif.onclick = () => { window.focus(); notif.close(); };
@@ -424,7 +424,7 @@ async function runNodeCore(
       if (!privateKey) throw new Error('Clé privée manquante — dans le fichier JSON du compte de service, copiez la valeur du champ « private_key ».');
       if (!/^[\w-]{20,}$/.test(spreadsheetId)) throw new Error('ID de classeur invalide — copiez l’identifiant long de l’URL du classeur (entre /d/ et /edit).');
       if (!(await hasRelay())) {
-        throw new Error('Google Sheets exige une signature côté serveur (CORS). Lancez le relais local : « npm start » dans le dossier Fluxia, puis relancez le flux.');
+        throw new Error('Google Sheets exige une signature côté serveur (CORS). Lancez le relais local : « npm start » Ã  la racine du projet, puis relancez le flux.');
       }
       const row = kvToEntries(resolved.values).map((f) => String(f.value ?? ''));
       const res = await fetch('/api/sheets-append', {

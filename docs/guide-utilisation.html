@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<title>Fluxia — Guide d'utilisation complet</title>
+<title>FormatPro3 Workflow — Guide d'utilisation complet</title>
 <style>
   @page { size: A4; margin: 17mm 15mm 15mm 15mm; }
   * { box-sizing: border-box; }
@@ -34,8 +34,8 @@
   tr { break-inside: avoid; }
   thead { display: table-header-group; }
   .cover { height: 245mm; display: flex; flex-direction: column; justify-content: center; break-after: page; }
-  .logo { font-size: 44pt; font-weight: 800; letter-spacing: -1.5px; color: #5b4bf0; }
-  .logo span { color: #101322; }
+  .logo { width: 300px; margin-bottom: .2em; }
+  
   .tagline { font-size: 13.5pt; color: #4a4f68; margin: .2em 0 2.4em; }
   .cover h1 { font-size: 27pt; line-height: 1.15; margin-bottom: .5em; }
   .cover .rule { width: 92px; height: 4px; background: #5b4bf0; margin: 1.3em 0; }
@@ -72,24 +72,25 @@
 
 <!-- ══════════════════════════ COUVERTURE ══════════════════════════ -->
 <section class="cover">
-  <div class="logo">⚡ Flux<span>ia</span></div>
+  <img class="logo" src="logo.png" alt="FormatPro3">
   <div class="tagline">Automatisation visuelle de workflows — comme n8n, dans votre navigateur</div>
   <h1>Guide d'utilisation complet</h1>
   <div class="rule"></div>
   <p class="meta">
+    <b>Produit :</b> FormatPro3 Workflow — éditeur de workflows par nœuds<br>
     <b>Version du logiciel :</b> 1.0 — 44 nœuds, 7 familles, 6 modèles<br>
     <b>Interface :</b> français · thème sombre · 100 % navigateur<br>
     <b>Dépôt :</b> github.com/ck526438-lgtm/fluxia (licence MIT)<br>
     <b>Démo en ligne :</b> ck526438-lgtm.github.io/fluxia<br>
     <b>Document :</b> octobre 2026
   </p>
-  <img src="screenshot.png" alt="Canvas Fluxia avec nœuds connectés">
+  <img src="screenshot.png" alt="Canvas FormatPro3 Workflow avec nœuds connectés">
 </section>
 
 <!-- ══════════════════════════ SOMMAIRE ══════════════════════════ -->
 <h2><span class="num">—</span>Sommaire</h2>
 <div class="toc">
-  <div><span class="c">1. Ce que Fluxia fait vraiment</span><br><span class="s">Philosophie « zéro démo », architecture, à qui s'adresse l'outil</span></div>
+  <div><span class="c">1. Ce que FormatPro3 Workflow fait vraiment</span><br><span class="s">Philosophie « zéro démo », architecture, à qui s'adresse l'outil</span></div>
   <div><span class="c">2. Installation et démarrage</span><br><span class="s">npm install / dev / build / start, le relais local, la démo GitHub Pages</span></div>
   <div><span class="c">3. Visite de l'interface</span><br><span class="s">Barre d'outils, palette, canvas, panneau de configuration, journal d'exécution</span></div>
   <div><span class="c">4. Les concepts fondamentaux</span><br><span class="s">Éléments (items), expressions {{ }}, identifiants $creds, ports, exécuter jusqu'ici</span></div>
@@ -104,23 +105,23 @@
   <div><span class="c">13. Annexe technique</span><br><span class="s">Arborescence, ajouter un nœud, build, CI, licence</span></div>
 </div>
 
-<h2><span class="num">1</span>Ce que Fluxia fait vraiment</h2>
-<p>Fluxia est un éditeur de workflows par nœuds, dans l'esprit de n8n : vous posez des briques sur un canvas infini, vous les reliez, vous configurez chaque étape dans le panneau de droite, vous lancez l'exécution, et vous voyez les données circuler de nœud en nœud. Les arêtes s'illuminent, les nœuds affichent un anneau pendant le traitement puis une coche verte ou une secousse d'erreur, et le journal détaille les entrées, sorties et durées de chaque étape.</p>
+<h2><span class="num">1</span>Ce que FormatPro3 Workflow fait vraiment</h2>
+<p>FormatPro3 Workflow est un éditeur de workflows par nœuds, dans l'esprit de n8n : vous posez des briques sur un canvas infini, vous les reliez, vous configurez chaque étape dans le panneau de droite, vous lancez l'exécution, et vous voyez les données circuler de nœud en nœud. Les arêtes s'illuminent, les nœuds affichent un anneau pendant le traitement puis une coche verte ou une secousse d'erreur, et le journal détaille les entrées, sorties et durées de chaque étape.</p>
 
 <h3>La règle « zéro démo »</h3>
 <p><b>Chaque nœud effectue une action réelle ou échoue honnêtement.</b> Il n'existe aucun simulateur, aucune réponse inventée, aucun « mode démo » caché. Un nœud <i>Envoyer un email</i> appelle l'API Brevo et le mail part. Un nœud <i>YouTube</i> téléverse le MP4 sur Google. Sans identifiant, l'exécution s'arrête sur le nœud concerné avec l'explication exacte — y compris l'URL où créer la clé et les scopes requis.</p>
-<div class="box tip"><span class="t">Conséquence pratique</span>Un message d'erreur dans Fluxia n'est jamais un mystère : il dit ce qui manque ou ce que la plateforme distante a refusé. Vous pouvez vous fier au journal pour diagnostiquer un vrai problème de production.</div>
+<div class="box tip"><span class="t">Conséquence pratique</span>Un message d'erreur dans FormatPro3 Workflow n'est jamais un mystère : il dit ce qui manque ou ce que la plateforme distante a refusé. Vous pouvez vous fier au journal pour diagnostiquer un vrai problème de production.</div>
 
 <h3>Trois niveaux d'utilisation</h3>
 <table>
   <tr><th style="width:26%">Niveau</th><th>Ce qu'il apporte</th><th style="width:30%">Prérequis</th></tr>
   <tr><td><b>Navigateur seul</b></td><td>Édition, exécution, 30+ nœuds 100 % locaux (HTTP, Code JS, conditions, données, IA extractive, CSV, notifications, Discord, Telegram, Notion, Brevo).</td><td>Aucun. La démo GitHub Pages suffit.</td></tr>
-  <tr><td><b>+ relais local</b></td><td>Débloque Slack, Google Sheets (compte de service), toutes les API qui refusent le CORS, et la publication vidéo sur les 7 réseaux.</td><td><code>npm start</code> dans le dossier Fluxia.</td></tr>
+  <tr><td><b>+ relais local</b></td><td>Débloque Slack, Google Sheets (compte de service), toutes les API qui refusent le CORS, et la publication vidéo sur les 7 réseaux.</td><td><code>npm start</code> dans la racine du projet.</td></tr>
   <tr><td><b>+ vos clés API</b></td><td>Envois réels, publications réelles, pages Notion, lignes de classeur.</td><td>Panneau <b>Identifiants</b> (<code>{{ $creds.nom }}</code>).</td></tr>
 </table>
 
 <h3>À qui cela s'adresse</h3>
-<p>Automatisation métier sans serveur : veille et reporting, triage de leads, enrichissement de données, notifications d'équipe, publication multi-réseaux. Tout reste sur votre machine — aucun compte Fluxia, aucun cloud, aucune télémétrie.</p>
+<p>Automatisation métier sans serveur : veille et reporting, triage de leads, enrichissement de données, notifications d'équipe, publication multi-réseaux. Tout reste sur votre machine — aucun compte FormatPro3 Workflow, aucun cloud, aucune télémétrie.</p>
 
 <h2><span class="num">2</span>Installation et démarrage</h2>
 <h3>Depuis le dépôt Git</h3>
@@ -449,7 +450,7 @@ npm start        # relais local + sert dist/ sur http://127.0.0.1:5174
 
 <h2 class="pagebreak"><span class="num">6</span>Identifiants et intégrations externes</h2>
 <h3>Le panneau Identifiants</h3>
-<p>Bouton <b>Identifiants</b> dans la barre d'outils : enregistrez une clé une seule fois sous un nom court, puis référencez-la partout avec <code>{{ $creds.nom }}</code>. Stockage <b>exclusivement local</b> (<code>localStorage</code> du navigateur) — aucune transmission à un serveur Fluxia, qui n'existe pas.</p>
+<p>Bouton <b>Identifiants</b> dans la barre d'outils : enregistrez une clé une seule fois sous un nom court, puis référencez-la partout avec <code>{{ $creds.nom }}</code>. Stockage <b>exclusivement local</b> (<code>localStorage</code> du navigateur) — aucune transmission à un serveur FormatPro3 Workflow, qui n'existe pas.</p>
 <pre>// dans un nœud Requête HTTP
 En-tête Authorization → Bearer {{ $creds.tokenApi }}
 // dans un nœud Envoyer un email
@@ -487,17 +488,17 @@ Clé API Brevo        → {{ $creds.brevo }}</pre>
 <h3>Deux familles de fonctionnement</h3>
 <table>
   <tr><th style="width:26%">Mode</th><th style="width:30%">Réseaux</th><th>Détail</th></tr>
-  <tr><td><b>URL remise à la plateforme</b></td><td>Instagram, Facebook, TikTok</td><td>Fluxia transmet l'URL ; <b>ce sont les serveurs du réseau qui viennent chercher le fichier</b>. L'URL doit donc être en HTTPS, publique, sans redirection ni protection par cookie. Instagram affiche même un conteneur créé avec succès avant d'échouer au polling : Fluxia attend et signale l'échec réel.</td></tr>
-  <tr><td><b>Octets envoyés par Fluxia</b></td><td>YouTube, Mastodon, Bluesky, X</td><td>Le relais lit la vidéo et la découpe selon le protocole du réseau (multipart YouTube, tranches de 5 Mo pour X, blob brut pour Bluesky). Taille totale plafonnée à 200 Mo côté relais.</td></tr>
+  <tr><td><b>URL remise à la plateforme</b></td><td>Instagram, Facebook, TikTok</td><td>FormatPro3 Workflow transmet l'URL ; <b>ce sont les serveurs du réseau qui viennent chercher le fichier</b>. L'URL doit donc être en HTTPS, publique, sans redirection ni protection par cookie. Instagram affiche même un conteneur créé avec succès avant d'échouer au polling : FormatPro3 Workflow attend et signale l'échec réel.</td></tr>
+  <tr><td><b>Octets envoyés par FormatPro3 Workflow</b></td><td>YouTube, Mastodon, Bluesky, X</td><td>Le relais lit la vidéo et la découpe selon le protocole du réseau (multipart YouTube, tranches de 5 Mo pour X, blob brut pour Bluesky). Taille totale plafonnée à 200 Mo côté relais.</td></tr>
 </table>
 
 <h3>Ce que chaque réseau impose</h3>
 <table>
   <tr><th style="width:16%">Réseau</th><th>Contraintes réelles (vérifiées sur l'API officielle)</th></tr>
   <tr><td>YouTube</td><td>Un quota d'environ 100 téléversements par jour ; compte Google normal obligatoire (les comptes de service ne peuvent pas téléverser) ; le jeton se passe en en-tête <code>Authorization: Bearer</code>.</td></tr>
-  <tr><td>Mastodon</td><td>Formats MP4 / MOV / WebM ; la limite de poids dépend de <b>votre instance</b> (Fluxia lit <code>video_size_limit</code> via <code>/api/v2/instance</code> et la respecte) ; un seul média vidéo par post ; environ 30 téléversements par 30 minutes.</td></tr>
-  <tr><td>Bluesky</td><td><b>MP4 uniquement</b> — un autre format est rejeté à la publication et Fluxia vous dit de réencoder en H.264/AAC. Limite d'envoi fixée par le PDS : ~5 Mo sur un serveur auto-hébergé par défaut, davantage sur les hébergeurs officiels. Voie simple retenue : le fichier est stocké <b>tel quel, sans transcodage</b> par le service vidéo de Bluesky — la publication est réelle, mais moins optimisée que depuis l'application mobile.</td></tr>
-  <tr><td>X</td><td>Tranches de 5 Mo, puis transcodage asynchrone : Fluxia attend l'état <code>succeeded</code> avant de publier, et signale un <code>failed</code> (format ou durée non supportés).</td></tr>
+  <tr><td>Mastodon</td><td>Formats MP4 / MOV / WebM ; la limite de poids dépend de <b>votre instance</b> (FormatPro3 Workflow lit <code>video_size_limit</code> via <code>/api/v2/instance</code> et la respecte) ; un seul média vidéo par post ; environ 30 téléversements par 30 minutes.</td></tr>
+  <tr><td>Bluesky</td><td><b>MP4 uniquement</b> — un autre format est rejeté à la publication et FormatPro3 Workflow vous dit de réencoder en H.264/AAC. Limite d'envoi fixée par le PDS : ~5 Mo sur un serveur auto-hébergé par défaut, davantage sur les hébergeurs officiels. Voie simple retenue : le fichier est stocké <b>tel quel, sans transcodage</b> par le service vidéo de Bluesky — la publication est réelle, mais moins optimisée que depuis l'application mobile.</td></tr>
+  <tr><td>X</td><td>Tranches de 5 Mo, puis transcodage asynchrone : FormatPro3 Workflow attend l'état <code>succeeded</code> avant de publier, et signale un <code>failed</code> (format ou durée non supportés).</td></tr>
   <tr><td>Instagram</td><td>Compte professionnel lié à une Page, app Meta approuvée, minimum 15 minutes entre deux Reels (code 382), HTTPS sans redirection.</td></tr>
   <tr><td>Facebook</td><td>Jeton de <b>Page</b> (pas personnel), permission <code>publish_video</code> ; l'URL est passée en <code>file_url</code>.</td></tr>
   <tr><td>TikTok</td><td>App non auditée : <code>SELF_ONLY</code> obligatoire et maximum ~5 publications par utilisateur sur 24 h ; en mode URL, <b>votre domaine doit être vérifié</b> dans le portail développeur, sinon <code>video_pull_failed</code>.</td></tr>
@@ -571,7 +572,7 @@ Clé API Brevo        → {{ $creds.brevo }}</pre>
 
 <h2><span class="num">12</span>Vos données, sécurité et bonnes pratiques</h2>
 <ul>
-  <li><b>100 % local.</b> Flux et identifiants vivent dans le <code>localStorage</code> du navigateur. Aucun serveur Fluxia, aucun compte, aucune télémétrie.</li>
+  <li><b>100 % local.</b> Flux et identifiants vivent dans le <code>localStorage</code> du navigateur. Aucun serveur FormatPro3 Workflow, aucun compte, aucune télémétrie.</li>
   <li><b>Le relais ne fait que transiter</b>, en mémoire, sur 127.0.0.1. Les jetons ne sont jamais écrits sur disque par le relais.</li>
   <li><b>Les IA locales n'envoient rien</b> ; seuls les moteurs « OpenAI compatible » sortent votre texte, et seulement si vous fournissez une clé.</li>
   <li><b>Ne partagez jamais un export JSON contenant des secrets</b> : les paramètres des nœuds sont dedans. Préférez <code>{{ $creds.* }}</code> et gardez les clés hors du fichier, ou nettoyez-les avant publication.</li>
@@ -618,7 +619,7 @@ src/
 </ul>
 
 <div class="foot">
-  Fluxia 1.0 — Guide d'utilisation complet · octobre 2026 · Licence MIT du logiciel · Reproduit depuis le contenu réel de l'application (44 nœuds, 6 modèles, relais v2). Les contraintes de plateforme listées au chapitre 7 proviennent de la documentation officielle des API et de tests réels effectués le 19 octobre 2026 ; elles peuvent évoluer du fait des services tiers.
+  FormatPro3 Workflow 1.0 — Guide d'utilisation complet · octobre 2026 · Licence MIT du logiciel · Reproduit depuis le contenu réel de l'application (44 nœuds, 6 modèles, relais v2). Les contraintes de plateforme listées au chapitre 7 proviennent de la documentation officielle des API et de tests réels effectués le 19 octobre 2026 ; elles peuvent évoluer du fait des services tiers.
 </div>
 
 </body>

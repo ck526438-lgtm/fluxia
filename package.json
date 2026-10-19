@@ -1,8 +1,8 @@
 {
-  "name": "fluxia",
+  "name": "formatpro3-workflow",
   "private": true,
   "version": "1.0.0",
-  "description": "Fluxia — Automatisation visuelle de workflows",
+  "description": "FormatPro3 Workflow — Automatisation visuelle de workflows",
   "license": "MIT",
   "type": "module",
   "scripts": {
