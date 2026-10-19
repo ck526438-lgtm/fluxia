@@ -12,11 +12,11 @@ anneau d'exécution sur les nœuds, panneaux à ressorts).
 Nouveauté : **publier une vraie vidéo sur 7 réseaux** — YouTube, Mastodon, Bluesky, X,
 Instagram Reels, Facebook Page et TikTok — depuis une simple URL.
 
-[![CI](https://github.com/ck526438-lgtm/fluxia/actions/workflows/ci.yml/badge.svg)](https://github.com/ck526438-lgtm/fluxia/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/Licence-MIT-3f6ad8)](LICENSE) ![Stack](https://img.shields.io/badge/React-19-61dafb) ![Vite](https://img.shields.io/badge/Vite-8-646cff) ![TS](https://img.shields.io/badge/TypeScript-5-3178c6)
+[![CI](https://github.com/ck526438-lgtm/formatpro3-workflow/actions/workflows/ci.yml/badge.svg)](https://github.com/ck526438-lgtm/formatpro3-workflow/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/Licence-MIT-3f6ad8)](LICENSE) ![Stack](https://img.shields.io/badge/React-19-61dafb) ![Vite](https://img.shields.io/badge/Vite-8-646cff) ![TS](https://img.shields.io/badge/TypeScript-5-3178c6)
 
 ![FormatPro3 Workflow — canvas de workflow avec nœuds connectés](docs/screenshot.png)
 
-**🌐 Démo en ligne : [ck526438-lgtm.github.io/fluxia](https://ck526438-lgtm.github.io/fluxia/)** —
+**🌐 Démo en ligne : [ck526438-lgtm.github.io/formatpro3-workflow](https://ck526438-lgtm.github.io/formatpro3-workflow/)** —
 redéployée automatiquement à chaque push. Version 100 % navigateur : le relais local
 (Slack, Google Sheets, publication vidéo, API fermées CORS) reste un extra de
 l'installation locale.
@@ -28,10 +28,11 @@ relais local, 6 modèles, raccourcis, tableau de dépannage et bonnes pratiques 
 Source imprimable : [docs/guide-utilisation.html](docs/guide-utilisation.html)
 (`msedge --headless --print-to-pdf=docs/guide-utilisation.pdf docs/guide-utilisation.html` pour le régénérer).
 
-> **Nom** : le produit s'appelle **FormatPro3 Workflow** (logo : `src/assets/logo-formatpro3.png`,
-> marque : `src/assets/logo-mark.png`, aussi favicon). Le dépôt et l'URL de la démo portent
-> encore l'ancien nom `fluxia` — c'est uniquement l'adresse technique ; renommer le dépôt
-> changerait `ck526438-lgtm.github.io/fluxia` en `…/formatpro3-workflow`.
+> **Nom** : le produit s'appelle **FormatPro3 Workflow** — dépôt `formatpro3-workflow`, démo
+> `…/formatpro3-workflow`. Logo : `src/assets/logo-formatpro3.png` (marque) et `src/assets/logo-mark.png`
+> (sigle « 3 », aussi favicon). Deux vestiges assumés : le dossier local peut encore s'appeler `fluxia`,
+> et les clés `localStorage` restent `fluxia:workflow:v1` / `fluxia:credentials:v1` pour ne perdre aucun
+> flux déjà enregistré.
 
 ## Démarrage
 
