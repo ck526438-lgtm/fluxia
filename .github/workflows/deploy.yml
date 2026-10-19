@@ -27,7 +27,9 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npx vite build --base=/fluxia/
+      # Base relative : le même build fonctionne sous n'importe quel chemin Pages,
+      # donc un renommage du dépôt ne casse pas la démo.
+      - run: npx vite build --base=./
       - uses: actions/configure-pages@v5
         with:
           enablement: true
