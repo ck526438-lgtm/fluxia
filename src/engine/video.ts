@@ -171,10 +171,17 @@ async function publishMastodon(p: Record<string, unknown>, meta: VideoMeta): Pro
     await sleep(2000);
     const st = await netFetch(`${api}/api/v1/media/${mediaId}`, { headers: H });
     if (st.status === 206) continue; // contenu partiel : l'encodage n'est pas fini
-    if (st.status === 0 || st.status >= 400) throw mastodonError(st.status, st.body, 'encodage de la vidéo');
+    if (st.status === 0 || st.status >= 400) {
+      await releaseMastodonMedia(api, H, mediaId);
+      throw mastodonError(st.status, st.body, 'encodage de la vidéo');
+    }
     ready = str(parse(st.body)?.url) !== '';
   }
-  if (!ready) throw new Error(`Mastodon (${host}) n’a pas terminé l’encodage de la vidéo en 80 s — réessayez un peu plus tard ou avec un fichier plus court.`);
+  if (!ready) {
+    // Média abandonné : un DELETE évite l'accumulation de fichiers orphelins (Mastodon ≥ 4.4).
+    await releaseMastodonMedia(api, H, mediaId);
+    throw new Error(`Mastodon (${host}) n’a pas terminé l’encodage de la vidéo en 80 s — réessayez un peu plus tard ou avec un fichier plus court.`);
+  }
 
   const post = await netFetch(`${api}/api/v1/statuses`, {
     method: 'POST',
@@ -182,8 +189,18 @@ async function publishMastodon(p: Record<string, unknown>, meta: VideoMeta): Pro
     body: formUrlEncoded({ status: str(p.text), 'media_ids[]': mediaId, visibility: str(p.visibility) || 'public' }),
   });
   const pj = parse(post.body);
-  if (post.status === 0 || post.status >= 400 || !str(pj?.id)) throw mastodonError(post.status, post.body, 'publication');
+  if (post.status === 0 || post.status >= 400 || !str(pj?.id)) {
+    await releaseMastodonMedia(api, H, mediaId);
+    throw mastodonError(post.status, post.body, 'publication');
+  }
   return { plateforme: 'Mastodon', instance: host, publicationId: str(pj?.id), url: str(pj?.url) || null, mediaId, taille: meta.size };
+}
+
+// Le DELETE échoue sur les instances anciennes : ce n'est que du nettoyage, on l'ignore.
+async function releaseMastodonMedia(api: string, H: Record<string, string>, mediaId: string): Promise<void> {
+  try {
+    await netFetch(`${api}/api/v1/media/${mediaId}`, { method: 'DELETE', headers: H });
+  } catch { /* média non libéré — sans impact sur le flux */ }
 }
 
 // ─────────────────────────────── Bluesky ───────────────────────────────
@@ -227,6 +244,8 @@ async function publishBluesky(p: Record<string, unknown>, meta: VideoMeta): Prom
   }
 
   // uploadBlob attend les octets bruts du MP4 — pas de multipart, pas de base64.
+  // Chemin simple : le fichier est stocké tel quel, sans repasser par le service vidéo
+  // de Bluesky (qui transcode). La publication est réelle, mais moins optimisée que via l'appli.
   const up = await videoChunk({
     id: meta.id,
     url: `${pdsUrl}/xrpc/com.atproto.repo.uploadBlob`,
