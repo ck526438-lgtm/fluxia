@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fluxia — Guide d'utilisation complet</title>
+<style>
+  @page { size: A4; margin: 17mm 15mm 15mm 15mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-size: 9.6pt; line-height: 1.5; color: #1b1e26; margin: 0;
+  }
+  h1, h2, h3, h4 { font-weight: 700; margin: 0 0 .35em; color: #101322; }
+  h2 { font-size: 16pt; margin-top: 1.6em; padding-bottom: .25em; border-bottom: 2.2px solid #5b4bf0; break-after: avoid; }
+  h2 .num { color: #5b4bf0; font-variant-numeric: tabular-nums; margin-right: .45em; }
+  h3 { font-size: 11.6pt; margin-top: 1.25em; color: #2c2f6b; break-after: avoid; }
+  h4 { font-size: 10pt; margin-top: 1em; color: #3a3d55; break-after: avoid; }
+  p { margin: 0 0 .55em; }
+  ul, ol { margin: 0 0 .65em; padding-left: 1.25em; }
+  li { margin-bottom: .18em; }
+  code, kbd {
+    font-family: "Cascadia Mono", Consolas, monospace; font-size: 8.6pt;
+    background: #f0f1f7; border: 1px solid #dcdfee; border-radius: 3px; padding: 0 .25em;
+  }
+  pre {
+    font-family: "Cascadia Mono", Consolas, monospace; font-size: 8.5pt; line-height: 1.45;
+    background: #f6f7fb; border: 1px solid #dfe2f0; border-left: 3px solid #5b4bf0;
+    border-radius: 4px; padding: .55em .7em; margin: .5em 0 .8em; white-space: pre-wrap; break-inside: avoid;
+  }
+  table { width: 100%; border-collapse: collapse; margin: .45em 0 .9em; font-size: 8.7pt; }
+  th { text-align: left; background: #eceefb; color: #23264a; font-weight: 600; border: 1px solid #d4d7ea; padding: .3em .45em; }
+  td { border: 1px solid #dde0ee; padding: .3em .45em; vertical-align: top; }
+  tr { break-inside: avoid; }
+  thead { display: table-header-group; }
+  .cover { height: 245mm; display: flex; flex-direction: column; justify-content: center; break-after: page; }
+  .logo { font-size: 44pt; font-weight: 800; letter-spacing: -1.5px; color: #5b4bf0; }
+  .logo span { color: #101322; }
+  .tagline { font-size: 13.5pt; color: #4a4f68; margin: .2em 0 2.4em; }
+  .cover h1 { font-size: 27pt; line-height: 1.15; margin-bottom: .5em; }
+  .cover .rule { width: 92px; height: 4px; background: #5b4bf0; margin: 1.3em 0; }
+  .cover .meta { font-size: 10pt; color: #575c74; }
+  .cover .meta b { color: #1b1e26; }
+  .cover img { width: 100%; border: 1px solid #d6d9ea; border-radius: 8px; margin-top: 1.6em; }
+  .lede { font-size: 10.4pt; color: #33374f; background: #f4f5fc; border-left: 3px solid #5b4bf0; padding: .6em .8em; border-radius: 3px; margin: .6em 0 1em; }
+  .box { border: 1px solid #d9dced; border-radius: 5px; padding: .6em .8em; margin: .6em 0 .9em; background: #fafbfe; break-inside: avoid; }
+  .box.warn { border-color: #f0c9a0; background: #fdf6ee; }
+  .box.danger { border-color: #f0b6b6; background: #fdf2f2; }
+  .box.tip { border-color: #a8e3c4; background: #f1fbf5; }
+  .box p:last-child { margin-bottom: 0; }
+  .box .t { font-weight: 700; display: block; margin-bottom: .2em; }
+  .toc { columns: 2; column-gap: 8mm; font-size: 9.4pt; }
+  .toc div { break-inside: avoid; margin-bottom: .5em; }
+  .toc .c { font-weight: 700; color: #5b4bf0; margin-bottom: .15em; }
+  .toc .s { color: #3c4058; padding-left: .9em; }
+  .fam { display: inline-block; font-size: 8.2pt; font-weight: 700; padding: .1em .5em; border-radius: 3px; color: #fff; }
+  .f-trigger { background: #7c5cd6; } .f-action { background: #3b82c4; } .f-video { background: #e0567a; }
+  .f-logic { background: #c99400; } .f-data { background: #159f74; } .f-ai { background: #c256d6; } .f-note { background: #b19100; }
+  .node { break-inside: avoid; margin: .8em 0 1em; border: 1px solid #e0e3f0; border-radius: 5px; padding: .55em .75em; }
+  .node h4 { margin: 0 0 .3em; }
+  .node table { margin: .3em 0 0; }
+  .node .desc { color: #4a4f68; font-size: 9pt; margin-bottom: .3em; }
+  .kv { font-size: 8.7pt; color: #4a4f68; }
+  .center { text-align: center; }
+  .small { font-size: 8.4pt; color: #5a5f78; }
+  .pagebreak { break-before: page; }
+  a { color: #3b34b8; text-decoration: none; }
+  .foot { margin-top: 2em; padding-top: .6em; border-top: 1px solid #d9dced; font-size: 8.4pt; color: #5a5f78; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ COUVERTURE ══════════════════════════ -->
+<section class="cover">
+  <div class="logo">⚡ Flux<span>ia</span></div>
+  <div class="tagline">Automatisation visuelle de workflows — comme n8n, dans votre navigateur</div>
+  <h1>Guide d'utilisation complet</h1>
+  <div class="rule"></div>
+  <p class="meta">
+    <b>Version du logiciel :</b> 1.0 — 44 nœuds, 7 familles, 6 modèles<br>
+    <b>Interface :</b> français · thème sombre · 100 % navigateur<br>
+    <b>Dépôt :</b> github.com/ck526438-lgtm/fluxia (licence MIT)<br>
+    <b>Démo en ligne :</b> ck526438-lgtm.github.io/fluxia<br>
+    <b>Document :</b> octobre 2026
+  </p>
+  <img src="screenshot.png" alt="Canvas Fluxia avec nœuds connectés">
+</section>
+
+<!-- ══════════════════════════ SOMMAIRE ══════════════════════════ -->
+<h2><span class="num">—</span>Sommaire</h2>
+<div class="toc">
+  <div><span class="c">1. Ce que Fluxia fait vraiment</span><br><span class="s">Philosophie « zéro démo », architecture, à qui s'adresse l'outil</span></div>
+  <div><span class="c">2. Installation et démarrage</span><br><span class="s">npm install / dev / build / start, le relais local, la démo GitHub Pages</span></div>
+  <div><span class="c">3. Visite de l'interface</span><br><span class="s">Barre d'outils, palette, canvas, panneau de configuration, journal d'exécution</span></div>
+  <div><span class="c">4. Les concepts fondamentaux</span><br><span class="s">Éléments (items), expressions {{ }}, identifiants $creds, ports, exécuter jusqu'ici</span></div>
+  <div><span class="c">5. Référence des 44 nœuds</span><br><span class="s">Déclencheurs, Actions, Vidéo, Logique, Données, Intelligence, Annotations</span></div>
+  <div><span class="c">6. Identifiants et intégrations externes</span><br><span class="s">Où obtenir chaque clé, ce que chaque service exige, panneau Identifiants</span></div>
+  <div><span class="c">7. Publier une vidéo sur 7 réseaux</span><br><span class="s">YouTube, Mastodon, Bluesky, X, Instagram, Facebook, TikTok : endpoints, limites, erreurs</span></div>
+  <div><span class="c">8. Le relais local en détail</span><br><span class="s">Routes, sécurité, limites 200 Mo / 15 minutes, quand il est obligatoire</span></div>
+  <div><span class="c">9. Les 6 modèles prêts à l'emploi</span><br><span class="s">Veille API, triage de leads, résumé IA, webhook enrichi, commandes, publication vidéo</span></div>
+  <div><span class="c">10. Raccourcis clavier</span><br><span class="s">Palette, exécution, historique, sélection, duplication</span></div>
+  <div><span class="c">11. Dépannage</span><br><span class="s">Message d'erreur → cause réelle → solution</span></div>
+  <div><span class="c">12. Vos données, sécurité et bonnes pratiques</span><br><span class="s">localStorage, jetons, Code JS, sauvegardes JSON</span></div>
+  <div><span class="c">13. Annexe technique</span><br><span class="s">Arborescence, ajouter un nœud, build, CI, licence</span></div>
+</div>
+
+<h2><span class="num">1</span>Ce que Fluxia fait vraiment</h2>
+<p>Fluxia est un éditeur de workflows par nœuds, dans l'esprit de n8n : vous posez des briques sur un canvas infini, vous les reliez, vous configurez chaque étape dans le panneau de droite, vous lancez l'exécution, et vous voyez les données circuler de nœud en nœud. Les arêtes s'illuminent, les nœuds affichent un anneau pendant le traitement puis une coche verte ou une secousse d'erreur, et le journal détaille les entrées, sorties et durées de chaque étape.</p>
+
+<h3>La règle « zéro démo »</h3>
+<p><b>Chaque nœud effectue une action réelle ou échoue honnêtement.</b> Il n'existe aucun simulateur, aucune réponse inventée, aucun « mode démo » caché. Un nœud <i>Envoyer un email</i> appelle l'API Brevo et le mail part. Un nœud <i>YouTube</i> téléverse le MP4 sur Google. Sans identifiant, l'exécution s'arrête sur le nœud concerné avec l'explication exacte — y compris l'URL où créer la clé et les scopes requis.</p>
+<div class="box tip"><span class="t">Conséquence pratique</span>Un message d'erreur dans Fluxia n'est jamais un mystère : il dit ce qui manque ou ce que la plateforme distante a refusé. Vous pouvez vous fier au journal pour diagnostiquer un vrai problème de production.</div>
+
+<h3>Trois niveaux d'utilisation</h3>
+<table>
+  <tr><th style="width:26%">Niveau</th><th>Ce qu'il apporte</th><th style="width:30%">Prérequis</th></tr>
+  <tr><td><b>Navigateur seul</b></td><td>Édition, exécution, 30+ nœuds 100 % locaux (HTTP, Code JS, conditions, données, IA extractive, CSV, notifications, Discord, Telegram, Notion, Brevo).</td><td>Aucun. La démo GitHub Pages suffit.</td></tr>
+  <tr><td><b>+ relais local</b></td><td>Débloque Slack, Google Sheets (compte de service), toutes les API qui refusent le CORS, et la publication vidéo sur les 7 réseaux.</td><td><code>npm start</code> dans le dossier Fluxia.</td></tr>
+  <tr><td><b>+ vos clés API</b></td><td>Envois réels, publications réelles, pages Notion, lignes de classeur.</td><td>Panneau <b>Identifiants</b> (<code>{{ $creds.nom }}</code>).</td></tr>
+</table>
+
+<h3>À qui cela s'adresse</h3>
+<p>Automatisation métier sans serveur : veille et reporting, triage de leads, enrichissement de données, notifications d'équipe, publication multi-réseaux. Tout reste sur votre machine — aucun compte Fluxia, aucun cloud, aucune télémétrie.</p>
+
+<h2><span class="num">2</span>Installation et démarrage</h2>
+<h3>Depuis le dépôt Git</h3>
+<pre>git clone https://github.com/ck526438-lgtm/fluxia.git
+cd fluxia
+npm install
+
+npm run dev      # développement — http://127.0.0.1:5173 (rechargement à chaud)
+npm run build    # production — génère dist/
+npm start        # relais local + sert dist/ sur http://127.0.0.1:5174
+</pre>
+<p>Node.js 18 ou plus récent est requis (<code>npm run dev</code> utilise Vite 8). <code>npm start</code> est <b>optionnel</b> : sans lui l'application tourne à 100 % dans le navigateur, à l'exception des appels bloqués par le CORS (voir chapitre 8).</p>
+
+<div class="box"><span class="t">Deux terminaux en développement</span>En mode <code>npm run dev</code>, Vite écoute sur 5173 et <b>proxyfie automatiquement</b> <code>/api/*</code> vers 5174. Lancez donc <code>npm run dev</code> dans un terminal et <code>node server.mjs</code> dans un second : l'application détecte seule la présence du relais (appel <code>/api/health</code>).</div>
+
+<h3>Ouvrir l'application</h3>
+<ul>
+  <li><b>Local, développement :</b> <code>http://127.0.0.1:5173</code></li>
+  <li><b>Local, build de production :</b> <code>http://127.0.0.1:5174</code> après <code>npm run build</code> puis <code>npm start</code></li>
+  <li><b>Sans installation :</b> <code>https://ck526438-lgtm.github.io/fluxia/</code> — redéployée à chaque poussée sur <code>main</code></li>
+</ul>
+<div class="box warn"><span class="t">La démo en ligne ne publie pas de vidéo</span>Les nœuds Vidéo, Slack et Google Sheets exigent le relais local, qui n'existe pas sur GitHub Pages (site statique). Le message d'erreur l'indique explicitement et la solution est locale.</div>
+
+<h3>Charger un premier flux</h3>
+<p>Bouton <b>Modèles</b> dans la barre d'outils → choisissez un modèle → <b>Charger</b>. Le canvas se remplit avec un flux complet et paramétré. Sinon <code>Ctrl K</code> → « Importer un flux » pour charger un JSON exporté.</p>
+
+<h2><span class="num">3</span>Visite de l'interface</h2>
+<table>
+  <tr><th style="width:24%">Zone</th><th>Rôle</th></tr>
+  <tr><td><b>Barre d'outils</b> (haut)</td><td>Nom du flux, <b>Exécuter</b> / <b>Arrêter</b>, vitesse <b>Normal / Turbo</b>, <b>Modèles</b>, <b>Identifiants</b>, annuler / rétablir, import / export JSON, sauvegarde locale, indicateur « Enregistré ».</td></tr>
+  <tr><td><b>Palette latérale</b> (gauche)</td><td>Les 44 nœuds groupés par famille, avec recherche. Ajout par <b>glisser-déposer</b> sur le canvas ou simple <b>clic</b>.</td></tr>
+  <tr><td><b>Canvas</b> (centre)</td><td>Zoom molette, panoramique glisser, minimap colorée par famille, alignement automatique (dagre), pastille de zoom, compteurs nœuds / liens, attribution React Flow.</td></tr>
+  <tr><td><b>Nœuds</b></td><td>Icône, titre, couleur de famille, badge du nombre d'éléments traités, poignées d'entrée/sortie, anneau d'exécution, coche verte, secousse d'erreur.</td></tr>
+  <tr><td><b>Connexions</b></td><td>Particules animées pendant l'exécution, bouton <code>+</code> au milieu pour insérer un nœud, bouton <code>×</code> pour supprimer le lien.</td></tr>
+  <tr><td><b>Panneau de configuration</b> (droite)</td><td>Formulaire généré depuis le schéma du nœud : texte, nombre, liste, booléen, paires clé/valeur, JSON, éditeur de code. Onglet d'inspection des <b>entrées / sorties</b>.</td></tr>
+  <tr><td><b>Journal d'exécution</b></td><td>Nœud par nœud : statut, durée, nombre d'éléments, détails entrée/sortie en JSON colorisé.</td></tr>
+  <tr><td><b>Menu contextuel</b> (clic droit)</td><td>Sur un nœud : paramètres, <b>exécuter jusqu'ici</b>, dupliquer, copier, désactiver, supprimer. Sur une connexion : insérer un nœud, supprimer. Sur le canvas : ajouter nœud ou note, coller, tout sélectionner, organiser.</td></tr>
+  <tr><td><b>Notes autocollantes</b></td><td>Post-it redimensionnables, 4 couleurs, rendus derrière les nœuds, aucun impact sur l'exécution.</td></tr>
+</table>
+
+<h2><span class="num">4</span>Les concepts fondamentaux</h2>
+<h3>4.1 Les éléments (items)</h3>
+<p>Une connexion ne transporte pas un objet : elle transporte une <b>liste d'éléments</b> (tableau de JSON). Chaque nœud reçoit cette liste et en produit une nouvelle. C'est ce qui permet à un <i>Éclater</i> de transformer une commande en dix éléments, ou à un <i>Agréger</i> de les recompter en un seul.</p>
+
+<h3>4.2 Les expressions <code>{{ … }}</code></h3>
+<p>Partout dans les champs de paramétrage, une expression entre accolades est évaluée <b>par élément</b>, juste avant l'exécution du nœud. C'est du JavaScript strict.</p>
+<table>
+  <tr><th style="width:38%">Variable</th><th>Contenu</th></tr>
+  <tr><td><code>{{ $json.champ }}</code></td><td>Le champ de l'élément en cours. <code>{{ $json.a?.b ?? "—" }}</code> fonctionne.</td></tr>
+  <tr><td><code>{{ $items.length }}</code></td><td>Tableau complet des éléments reçus + index courant.</td></tr>
+  <tr><td><code>{{ $index }}</code></td><td>Position de l'élément dans la liste (0, 1, 2…).</td></tr>
+  <tr><td><code>{{ $node["Mon nœud"].json.total }}</code></td><td>Sortie d'un autre nœud, désigné par son <b>libellé</b>. Également <code>.items</code>, <code>.all()</code>, <code>.first()</code>.</td></tr>
+  <tr><td><code>{{ $now.toISOString() }}</code></td><td>Date du début de l'exécution (objet <code>Date</code> : <code>toLocaleDateString("fr-FR")</code>, <code>getTime()</code>…).</td></tr>
+  <tr><td><code>{{ $creds.maCle }}</code></td><td>Valeur enregistrée dans le panneau <b>Identifiants</b>. Rien n'est ressaisi.</td></tr>
+</table>
+<div class="box"><span class="t">Chaque ou une expression entière</span>Si le champ contient <b>uniquement</b> <code>{{ … }}</code>, le résultat garde son type naturel (nombre, booléen, objet, tableau). Si l'expression est noyée dans du texte, elle est convertie en chaîne — et un objet est sérialisé en JSON.</div>
+
+<h3>4.3 Ports et branchements</h3>
+<p>Un nœud peut avoir plusieurs sorties numérotées : <i>Condition</i> a <b>Vrai / Faux</b>, <i>Aiguillage</i> a jusqu'à trois cas. Une branche non empruntée ne s'exécute pas : ses nœuds apparaissent comme ignorés au journal, et le flux continue sans erreur.</p>
+
+<h3>4.4 Exécuter le flux, exécuter jusqu'ici</h3>
+<ul>
+  <li><b>Exécuter</b> (<code>Ctrl ↵</code>) : parcours en ordre topologique complet.</li>
+  <li><b>Exécuter jusqu'ici</b> (clic droit sur un nœud) : n'exécute que <b>tous les ancêtres</b> du nœud, puis s'arrête sur lui. Idéal pour tester une étape coûteuse sans déclencher les suivants — ni envoyer dix emails.</li>
+  <li><b>Arrêter</b> : interrompt l'exécution en cours.</li>
+  <li><b>Vitesse</b> : <i>Normal</i> laisse voir les animations, <i>Turbo</i> exécute sans temporisation.</li>
+</ul>
+
+<h3>4.5 Sauvegarde, historique, partage</h3>
+<ul>
+  <li><b>Sauvegarde automatique</b> dans le <code>localStorage</code> du navigateur (indicateur « Enregistré ») ; <code>Ctrl S</code> force l'écriture.</li>
+  <li><b>Annuler / rétablir</b> : <code>Ctrl Z</code> / <code>Ctrl ⇧ Z</code>, sur la structure du graphe.</li>
+  <li><b>Export JSON</b> : le flux complet (nœuds, liens, positions, paramètres) dans un fichier. <b>Import</b> pour le rejouer ailleurs ou le versionner dans Git.</li>
+  <li>Copier / coller / dupliquer : <code>Ctrl C</code> / <code>Ctrl V</code> / <code>Ctrl D</code>.</li>
+</ul>
+<div class="box warn"><span class="t">Le localStorage n'est pas une sauvegarde</span>Il est propre à un navigateur et à un profil. Exportez en JSON avant de changer de machine, de nettoyer les données de navigation, ou avant une modification risquée.</div>
+
+<h2><span class="num">5</span>Référence des 44 nœuds</h2>
+<p class="kv">Familles : <span class="fam f-trigger">Déclencheurs</span> <span class="fam f-action">Actions</span> <span class="fam f-video">Vidéo</span> <span class="fam f-logic">Logique</span> <span class="fam f-data">Données</span> <span class="fam f-ai">Intelligence</span> <span class="fam f-note">Annotations</span></p>
+
+<h3><span class="fam f-trigger">Déclencheurs</span> — 4 nœuds</h3>
+<div class="node">
+  <h4>Déclencheur manuel <code>manualTrigger</code></h4>
+  <p class="desc">Lance le flux à la demande avec des données d'exemple. Point d'entrée le plus simple pour concevoir et tester.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Données d'exemple</td><td>JSON</td><td>Le ou les éléments injectés dans le flux. Un objet simple devient un élément ; un tableau en devient plusieurs.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Planificateur <code>scheduleTrigger</code></h4>
+  <p class="desc">Démarre selon une planification. La fréquence est affichée et l'expression cron est conservée dans le flux pour un déclenchement côté serveur.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Fréquence</td><td>liste</td><td>Chaque minute, chaque heure, chaque jour, chaque semaine.</td></tr>
+  <tr><td>Expression cron</td><td>texte</td><td><code>0 9 * * 1-5</code> = 9 h du lundi au vendredi. <code>* * * * *</code> = chaque minute.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Webhook <code>webhookTrigger</code></h4>
+  <p class="desc">Reçoit un appel HTTP entrant sur un chemin dédié, avec une charge utile d'exemple pour tester le flux sans serveur externe.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Chemin</td><td>texte</td><td>Suffixe d'URL du webhook, ex. <code>nouvel-achat</code>.</td></tr>
+  <tr><td>Méthode</td><td>liste</td><td>GET, POST, PUT, PATCH, DELETE.</td></tr>
+  <tr><td>Charge utile d'exemple</td><td>JSON</td><td>Corps simulé lors d'une exécution manuelle du flux.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Formulaire <code>formTrigger</code></h4>
+  <p class="desc">Déclenche le flux sur soumission d'un formulaire défini dans le nœud (champs clés/valeurs). Utile pour les collectes de leads et les demandes internes.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Nom du formulaire</td><td>texte</td><td>Titre affiché.</td></tr>
+  <tr><td>Champs</td><td>clés/valeurs</td><td>Nom du champ + valeur d'exemple ou expression.</td></tr></table>
+</div>
+
+<h3><span class="fam f-action">Actions</span> — 9 nœuds</h3>
+<div class="node">
+  <h4>Requête HTTP <code>httpRequest</code></h4>
+  <p class="desc">Appelle n'importe quelle API REST. Exécution réelle : la réponse JSON devient les éléments suivants. Si une API refuse le navigateur (CORS), le nœud bascule automatiquement par le relais local quand il tourne.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Méthode</td><td>liste</td><td>GET, POST, PUT, PATCH, DELETE.</td></tr>
+  <tr><td>URL</td><td>texte</td><td>Expressions acceptées : <code>…/users/{{ $json.userId }}</code>.</td></tr>
+  <tr><td>En-têtes</td><td>clés/valeurs</td><td>Ex. <code>Authorization</code> → <code>Bearer {{ $creds.tokenApi }}</code>.</td></tr>
+  <tr><td>Corps (JSON)</td><td>JSON</td><td>Envoyé pour POST / PUT / PATCH.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Envoyer un email <code>emailSend</code> — Brevo</h4>
+  <p class="desc">Envoi réel via l'API SMTP de Brevo (<code>api.brevo.com/v3/smtp/email</code>). Aucun envoi simulé : sans clé valide, le nœud échoue avec le message de Brevo.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Clé API Brevo</td><td>texte</td><td>app.brevo.com → SMTP &amp; API → Clés API (format <code>xkeysib-…</code>). Préférer <code>{{ $creds.brevo }}</code>.</td></tr>
+  <tr><td>Expéditeur</td><td>texte</td><td><b>Doit être une adresse validée dans Brevo</b>, sinon refus de l'API.</td></tr>
+  <tr><td>Destinataire / Sujet / Message</td><td>texte</td><td>Expressions possibles partout.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Slack <code>slackMessage</code></h4>
+  <p class="desc">Poste un message via un webhook d'entrée Slack. <b>Passe par le relais local</b> (l'API Slack n'autorise pas les appels navigateur).</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>URL de webhook</td><td>texte</td><td>api.slack.com/messaging/webhooks → <code>https://hooks.slack.com/services/…</code></td></tr>
+  <tr><td>Message</td><td>texte</td><td>Émojis et mises en forme Slack acceptés.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Discord <code>discordMessage</code></h4>
+  <p class="desc">Poste un message réel via un webhook Discord — fonctionne directement depuis le navigateur.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>URL de webhook</td><td>texte</td><td>Serveur → Paramètres → Intégrations → Webhooks → Copier l'URL.</td></tr>
+  <tr><td>Message</td><td>texte</td><td>Contenu du message.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Telegram <code>telegramMessage</code></h4>
+  <p class="desc">Envoie un message réel via l'API Bot Telegram (<code>api.telegram.org/bot&lt;token&gt;/sendMessage</code>).</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Jeton du bot</td><td>texte</td><td>Créé avec <b>@BotFather</b> (<code>/newbot</code>).</td></tr>
+  <tr><td>ID de conversation</td><td>texte</td><td><code>chat_id</code> — écrivez au bot puis consultez <code>…/getUpdates</code> pour le récupérer.</td></tr>
+  <tr><td>Message</td><td>texte</td><td>Contenu envoyé.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Exporter CSV <code>csvExport</code></h4>
+  <p class="desc">Convertit les éléments reçus en CSV et <b>télécharge le fichier</b> dans le navigateur. Fonctionnement local, aucune donnée envoyée.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Nom du fichier</td><td>texte</td><td>Ex. <code>veille-api.csv</code>.</td></tr>
+  <tr><td>Séparateur</td><td>liste</td><td><code>;</code> (Excel français) ou <code>,</code> (standard).</td></tr></table>
+</div>
+<div class="node">
+  <h4>Notification <code>notification</code></h4>
+  <p class="desc">Affiche une notification système du navigateur. Demande l'autorisation du site au premier déclenchement.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Titre / Message</td><td>texte</td><td>Expressions possibles.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Google Sheets <code>sheetsAppend</code></h4>
+  <p class="desc">Ajoute une ligne réelle dans un classeur via un <b>compte de service</b> Google. Signature JWT effectuée par le relais local (jamais dans le navigateur).</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Email du compte de service</td><td>texte</td><td>Champ <code>client_email</code> du JSON de clé.</td></tr>
+  <tr><td>Clé privée</td><td>texte</td><td>Champ <code>private_key</code> (avec les <code>\n</code> conservés).</td></tr>
+  <tr><td>ID du classeur</td><td>texte</td><td>La longue partie de <code>docs.google.com/spreadsheets/d/&lt;ID&gt;</code>.</td></tr>
+  <tr><td>Feuille et plage</td><td>texte</td><td><code>Feuille 1!A1</code>.</td></tr>
+  <tr><td>Valeurs de la ligne</td><td>clés/valeurs</td><td>Une paire par colonne.</td></tr></table>
+  <div class="box warn"><span class="t">Partagez le classeur</span>Ajoutez l'email du compte de service comme <b>éditeur</b> du classeur, sinon Google renvoie « permission denied ».</div>
+</div>
+<div class="node">
+  <h4>Notion <code>notionCreate</code></h4>
+  <p class="desc">Crée une page réelle dans une base Notion via l'API officielle (<code>api.notion.com/v1/pages</code>).</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Jeton d'intégration</td><td>texte</td><td>notion.so/my-integrations → nouvelle intégration → <b>cochez la base</b> dans « Operated databases ».</td></tr>
+  <tr><td>ID de la base</td><td>texte</td><td>Identifiant après <code>/</code> dans l'URL de la base.</td></tr>
+  <tr><td>Propriété titre</td><td>texte</td><td>Nom exact de la propriété « Titre » (par défaut <code>Name</code>).</td></tr>
+  <tr><td>Titre / Contenu</td><td>texte</td><td>Valeurs de la page créée.</td></tr></table>
+</div>
+
+<h3><span class="fam f-video">Vidéo</span> — 7 nœuds</h3>
+<p class="kv">Tous partagent le paramètre <b>URL de la vidéo</b> (<code>{{ $json.video }}</code> par défaut) : un <b>lien direct</b> vers le fichier (mp4, mov, webm), joignable sans login. Le chapitre 7 détaille les contraintes de chaque réseau.</p>
+<div class="node">
+  <h4>YouTube <code>videoYoutube</code></h4>
+  <p class="desc">Télécharge la vidéo via le relais et la téléverse réellement sur YouTube (<code>upload/youtube/v3/videos</code>, upload multipart).</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Jeton d'accès OAuth</td><td>texte</td><td><code>ya29.…</code>, scope <code>youtube.upload</code>. Comptes de service non pris en charge par YouTube.</td></tr>
+  <tr><td>Titre / Description / Tags</td><td>texte</td><td>Tags séparés par des virgules.</td></tr>
+  <tr><td>Catégorie</td><td>liste</td><td>People &amp; Blogs, Divertissement, Éducation, Science &amp; Tech, Musique, Jeux vidéo.</td></tr>
+  <tr><td>Visibilité</td><td>liste</td><td>Privée (défaut), Non répertoriée, Publique.</td></tr>
+  <tr><td>Conçue pour les enfants</td><td>booléen</td><td>Obligation légale COPPA ; impacte les commentaires et les recommandations.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Mastodon <code>videoMastodon</code></h4>
+  <p class="desc">Publie une vraie vidéo sur l'instance de votre choix : <code>POST /api/v2/media</code> puis publication du statut.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Instance</td><td>texte</td><td>Domaine seul, sans <code>https://</code> — ex. <code>mastodon.social</code>.</td></tr>
+  <tr><td>Jeton d'accès</td><td>texte</td><td>Préférences → Développement → « Générer un jeton », scopes <code>write:media</code> + <code>write:statuses</code>.</td></tr>
+  <tr><td>Message</td><td>texte</td><td>Le post.</td></tr>
+  <tr><td>Texte alternatif vidéo</td><td>texte</td><td>Description pour lecteurs d'écran (recommandé, accessible).</td></tr>
+  <tr><td>Visibilité</td><td>liste</td><td>Publique, Non listée, Abonnés, Direct.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Bluesky <code>videoBluesky</code></h4>
+  <p class="desc">Session XRPC, téléversement du MP4 sur le PDS du compte puis création de l'enregistrement <code>app.bsky.feed.post</code> avec l'incorporation vidéo.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Hébergeur (PDS)</td><td>texte</td><td><code>bsky.social</code> par défaut, ou le domaine de votre PDS auto-hébergé.</td></tr>
+  <tr><td>Identifiant</td><td>texte</td><td><code>monpseudo.bsky.social</code> ou le handle.</td></tr>
+  <tr><td>Mot de passe d'application</td><td>texte</td><td>Paramètres → Sécurité → Mots de passe d'application. <b>Le mot de passe réel est refusé.</b></td></tr>
+  <tr><td>Message</td><td>texte</td><td>Le post.</td></tr>
+  <tr><td>Texte alternatif vidéo</td><td>texte</td><td>Optionnel, accessible.</td></tr></table>
+</div>
+<div class="node">
+  <h4>X (Twitter) <code>videoX</code></h4>
+  <p class="desc">Protocole v2 réel : <code>initialize</code> → envoi par tranches de 5 Mo → <code>finalize</code> → attente du transcodage → publication du post. <b>Relais obligatoire</b> (pas de CORS).</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>User access token</td><td>texte</td><td>developer.x.com → projet → scopes <code>media.write</code> + <code>tweet.write</code>.</td></tr>
+  <tr><td>Post</td><td>texte</td><td>Texte publié avec la vidéo.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Instagram Reels <code>videoInstagram</code></h4>
+  <p class="desc">Crée le conteneur <code>REELS</code> avec l'URL, <b>attend que Meta récupère la vidéo</b> (polling <code>status_code</code>) puis publie via <code>media_publish</code>.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>ID du compte Instagram</td><td>texte</td><td>Graph API Explorer → <i>Instagram Business Account</i>.</td></tr>
+  <tr><td>Jeton d'accès Meta</td><td>texte</td><td>Permissions <code>instagram_content_publish</code> + <code>pages_read_engagement</code>.</td></tr>
+  <tr><td>Légende</td><td>texte</td><td>Caption du Reel.</td></tr>
+  <tr><td>Partager aussi dans le fil</td><td>booléen</td><td>Ajoute le Reel au fil du profil.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Facebook Page <code>videoFacebook</code></h4>
+  <p class="desc">Met réellement la vidéo en ligne sur une Page (<code>POST /{page}/videos</code> avec <code>file_url</code>) : Meta la récupère à partir de l'URL.</p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>ID de la Page</td><td>texte</td><td>Page → À propos → Identifiant de la Page.</td></tr>
+  <tr><td>Jeton d'accès de la Page</td><td>texte</td><td>Permissions <code>publish_video</code> + <code>pages_manage_metadata</code>.</td></tr>
+  <tr><td>Titre / Description</td><td>texte</td><td>Informations de la vidéo.</td></tr></table>
+</div>
+<div class="node">
+  <h4>TikTok <code>videoTiktok</code></h4>
+  <p class="desc">Content Posting API, mode <code>PULL_FROM_URL</code> : initialisation puis suivi du statut de publication. <b>Relais obligatoire.</b></p>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Jeton d'accès</td><td>texte</td><td>developers.tiktok.com → scope <code>video.publish</code>.</td></tr>
+  <tr><td>Titre / description</td><td>texte</td><td>TikTok affiche ce texte sous la vidéo.</td></tr>
+  <tr><td>Visibilité</td><td>liste</td><td>Moi uniquement (défaut), Abonnés croisés, Mes abonnés, Public — <b>« Public » exige une app auditée</b>.</td></tr>
+  <tr><td>URL de la miniature</td><td>texte</td><td>Optionnel, image publique.</td></tr>
+  <tr><td>Commentaires / Duettes / Stitch</td><td>booléen</td><td>Active ou coupe les interactions.</td></tr></table>
+</div>
+
+<h3><span class="fam f-logic">Logique</span> — 6 nœuds</h3>
+<div class="node">
+  <h4>Condition <code>if</code> — sorties Vrai / Faux</h4>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Valeur 1 / Valeur 2</td><td>texte</td><td>Expressions acceptées (<code>{{ $json.montant }}</code>).</td></tr>
+  <tr><td>Opérateur</td><td>liste</td><td>égal à, différent de, supérieur à, inférieur à, contient, ne contient pas, commence par, se termine par, existe, est vide.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Aiguillage <code>switch</code> — jusqu'à 3 branches</h4>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Valeur testée</td><td>texte</td><td>Comparée à chaque cas.</td></tr>
+  <tr><td>Cas 1, Cas 2</td><td>texte</td><td>Le <b>dernier port sert de repli</b> : les éléments sans correspondance y vont.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Fusionner <code>merge</code> — 2 entrées</h4>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Mode</td><td>liste</td><td><i>Concaténer</i> (mise à la suite) ou <i>Fusionner par index</i> (champs combinés élément par élément).</td></tr></table>
+</div>
+<div class="node">
+  <h4>Attendre <code>wait</code></h4>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Durée (secondes)</td><td>nombre</td><td>Suspend l'exécution ; utile pour ménager un quota d'API.</td></tr></table>
+</div>
+<div class="node">
+  <h4>Filtrer <code>filter</code> · Limiter <code>limit</code></h4>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Filtrer — conditions</td><td>clés/valeurs</td><td>Ne conserve que les éléments qui passent la condition (mêmes opérateurs que <i>Condition</i>).</td></tr>
+  <tr><td>Limiter — maximum</td><td>nombre</td><td>Tronque la liste d'éléments.</td></tr></table>
+</div>
+
+<h3><span class="fam f-data">Données</span> — 11 nœuds</h3>
+<div class="node">
+  <h4>Éditer les champs <code>set</code></h4>
+  <table><tr><th style="width:28%">Paramètre</th><th style="width:16%">Type</th><th>Description</th></tr>
+  <tr><td>Champs</td><td>clés/valeurs</td><td>Ajoute ou remplace des champs, expressions incluses.</td></tr>
+  <tr><td>Conserver uniquement ces champs</td><td>booléen</td><td><b>Vrai</b> = ne garde que les champs listés (nettoyage avant CSV).</td></tr></table>
+</div>
+<div class="node">
+  <h4>Code JS <code>code</code></h4>
+  <p class="desc">Transforme les données avec du JavaScript exécuté réellement dans le navigateur. Variable <code>items</code> disponible, retournez un tableau.</p>
+  <pre>return items.map((item) =&gt; ({
+  ...item,
+  segment: item.montant &gt; 1000 ? "VIP" : "standard",
+  traiteLe: new Date().toISOString(),
+}));</pre>
+  <div class="box danger"><span class="t">Code exécuté tel quel</span><code>new Function</code>, sans bac à sable : n'exécutez que du code que vous comprenez, et n'importez pas un flux JSON venu d'ailleurs sans l'avoir relu.</div>
+</div>
+<table>
+  <tr><th style="width:26%">Nœud</th><th style="width:12%">Type</th><th>Paramètres et usage</th></tr>
+  <tr><td>Éclater <code>splitOut</code></td><td>Données</td><td><b>Champ tableau</b> — transforme un tableau en un élément par entrée (ex. <code>commandes</code> → N éléments).</td></tr>
+  <tr><td>Agréger <code>aggregate</code></td><td>Données</td><td><b>Opération</b> : Compter, Collecter, Somme d'un champ (+ <b>Champ</b> pour la somme).</td></tr>
+  <tr><td>Date &amp; Heure <code>dateTime</code></td><td>Données</td><td><b>Opération</b> : Maintenant / Décaler ; <b>Quantité</b>, <b>Unité</b> (minutes, heures, jours), <b>Champ de sortie</b> (défaut <code>date</code>).</td></tr>
+  <tr><td>Crypto <code>crypto</code></td><td>Données</td><td><b>Champ source</b>, <b>Algorithme</b> : SHA-256, SHA-1, SHA-384, SHA-512, Base64, Hexadécimal, <b>Champ de sortie</b>. Local, aucun envoi.</td></tr>
+  <tr><td>Parser JSON <code>jsonParse</code></td><td>Données</td><td><b>Champ à parser</b> — convertit une chaîne JSON en objet exploitable par les expressions.</td></tr>
+  <tr><td>Dédoublonner <code>removeDuplicates</code></td><td>Données</td><td><b>Champ de comparaison</b> (vide = élément entier).</td></tr>
+  <tr><td>Trier <code>sort</code></td><td>Données</td><td><b>Champ</b>, <b>Ordre</b> : décroissant / croissant.</td></tr>
+  <tr><td>Pause neutre <code>noOp</code></td><td>Données</td><td>Aucun paramètre — laisse passer les éléments. Sert de carrefour ou de repère d'inspection.</td></tr>
+</table>
+
+<h3><span class="fam f-ai">Intelligence</span> — 7 nœuds</h3>
+<p>Cinq nœuds (<i>Résumer</i>, <i>Sentiment</i>, <i>Classifier</i>, <i>Extraire des données</i>, <i>Traduire</i>) fonctionnent <b>hors ligne, sans clé</b>, par analyse locale : rien ne quitte votre navigateur. <i>Résumer</i> et <i>Chat IA</i> proposent un moteur <i>OpenAI compatible</i> — dans ce cas uniquement, une clé est demandée.</p>
+<table>
+  <tr><th style="width:26%">Nœud</th><th>Paramètres</th></tr>
+  <tr><td>Résumer <code>aiSummarize</code></td><td><b>Moteur</b> (Local extractif / OpenAI compatible), <b>Texte à résumer</b>, <b>Clé API</b> et <b>Modèle</b> (gpt-4o-mini) si moteur OpenAI. Sorties <code>resume</code> et <code>motsCles</code>.</td></tr>
+  <tr><td>Sentiment <code>aiSentiment</code></td><td><b>Texte analysé</b>. Sortie positive / négative / neutre.</td></tr>
+  <tr><td>Classifier <code>aiClassify</code></td><td><b>Texte analysé</b>, <b>Catégories</b> (paires clé = nom, valeur = mots-clés). Sortie <code>categorie</code>, idéale pour alimenter un <i>Aiguillage</i>.</td></tr>
+  <tr><td>Chat IA <code>aiChat</code></td><td><b>Moteur</b>, <b>Consigne</b>, <b>Clé API</b>, <b>Modèle</b>, <b>URL de base</b> (<code>https://api.openai.com/v1</code>, remplaçable par toute API compatible), <b>Champ de sortie</b>.</td></tr>
+  <tr><td>Agent IA <code>aiAgent</code></td><td><b>Objectif de l'agent</b>, <b>Champ de sortie</b> — analyse l'entrée et propose un plan d'action.</td></tr>
+  <tr><td>Extraire des données <code>aiExtract</code></td><td><b>Texte source</b>, <b>Champs à extraire</b> (paires) — structuré un texte non structuré (email, montant, date…).</td></tr>
+  <tr><td>Traduire <code>aiTranslate</code></td><td><b>Texte</b>, <b>Langue cible</b> : Anglais, Français, Espagnol (dictionnaire local).</td></tr>
+</table>
+
+<h3><span class="fam f-note">Annotations</span> — 1 nœud</h3>
+<p><b>Note</b> <code>stickyNote</code> : post-it redimensionnable, <b>Contenu</b> libre et <b>Couleur</b> (jaune, violet, bleu, vert). Rendu derrière les nœuds, jamais exécuté — documentez les zones du canvas.</p>
+
+<h2 class="pagebreak"><span class="num">6</span>Identifiants et intégrations externes</h2>
+<h3>Le panneau Identifiants</h3>
+<p>Bouton <b>Identifiants</b> dans la barre d'outils : enregistrez une clé une seule fois sous un nom court, puis référencez-la partout avec <code>{{ $creds.nom }}</code>. Stockage <b>exclusivement local</b> (<code>localStorage</code> du navigateur) — aucune transmission à un serveur Fluxia, qui n'existe pas.</p>
+<pre>// dans un nœud Requête HTTP
+En-tête Authorization → Bearer {{ $creds.tokenApi }}
+// dans un nœud Envoyer un email
+Clé API Brevo        → {{ $creds.brevo }}</pre>
+
+<h3>Ce qu'il faut pour chaque service</h3>
+<table>
+  <tr><th style="width:22%">Service</th><th style="width:22%">Où l'obtenir</th><th style="width:22%">Prérequis côté service</th><th>Passage par le relais</th></tr>
+  <tr><td>Brevo (email)</td><td>app.brevo.com → SMTP &amp; API → Clés API</td><td>Expéditeur <b>validé</b> dans Brevo</td><td>Non (navigateur)</td></tr>
+  <tr><td>Discord</td><td>Serveur → Intégrations → Webhooks</td><td>Webhook du salon cible</td><td>Non</td></tr>
+  <tr><td>Telegram</td><td>@BotFather → <code>/newbot</code></td><td><code>chat_id</code> de la conversation</td><td>Non</td></tr>
+  <tr><td>Notion</td><td>notion.so/my-integrations</td><td>Intégration connectée à la base, propriété titre exacte</td><td>Non</td></tr>
+  <tr><td>Slack</td><td>api.slack.com/messaging/webhooks</td><td>Webhook d'entrée</td><td><b>Oui</b> (CORS)</td></tr>
+  <tr><td>Google Sheets</td><td>console.cloud.google.com → compte de service</td><td>Classeur partagé avec l'email du compte</td><td><b>Oui</b> (signature JWT)</td></tr>
+  <tr><td>Requête HTTP</td><td>—</td><td>Selon l'API</td><td>Repli automatique si CORS</td></tr>
+  <tr><td>YouTube</td><td>OAuth Playground / Google Cloud</td><td>Scope <code>youtube.upload</code>, compte Google normal</td><td><b>Oui</b> (octets)</td></tr>
+  <tr><td>Mastodon</td><td>Préférences → Développement</td><td><code>write:media</code> + <code>write:statuses</code></td><td>Octets oui ; API joignable depuis le navigateur</td></tr>
+  <tr><td>Bluesky</td><td>Paramètres → Sécurité → Mots de passe d'application</td><td>MP4 uniquement, quota du PDS</td><td>Octets oui</td></tr>
+  <tr><td>X (Twitter)</td><td>developer.x.com</td><td><code>media.write</code> + <code>tweet.write</code></td><td><b>Oui</b> (CORS)</td></tr>
+  <tr><td>Instagram Reels</td><td>developers.facebook.com (Graph API)</td><td>Compte <b>professionnel</b> + app approuvée</td><td>Non (URL remise à Meta)</td></tr>
+  <tr><td>Facebook Page</td><td>developers.facebook.com</td><td>Page + jeton Page, <code>publish_video</code></td><td>Non (URL)</td></tr>
+  <tr><td>TikTok</td><td>developers.tiktok.com</td><td>App auditée pour « Public », domaine vérifié pour PULL_FROM_URL</td><td><b>Oui</b> (CORS)</td></tr>
+</table>
+
+<h2><span class="num">7</span>Publier une vidéo sur 7 réseaux</h2>
+<h3>Les deux règles communes</h3>
+<ol>
+  <li><b>Le relais local doit tourner</b> (<code>npm start</code>). Il récupère les octets de la vidéo et les transmet à la plateforme — sans lui, le nœud s'arrête avec ce message, avant même de vérifier les clés.</li>
+  <li><b>URL directe vers le fichier</b> : un lien qui renvoie le MP4, pas une page de lecture. Si l'URL renvoie du HTML ou du texte, le relais refuse avec « L'URL ne renvoie pas une vidéo… ».</li>
+</ol>
+
+<h3>Le contrôle préalable (preflight)</h3>
+<p>Avant le moindre octet téléchargé, chaque nœud vidéo vérifie que <b>toutes ses informations d'identification sont remplies</b> et échoue immédiatement avec la phrase exacte — où créer la clé et quels scopes cocher. Résultat mesuré : une exécution mal configurée échoue en ~23 ms au lieu de ~1 s, sans téléverser une vidéo de 100 Mo pour rien. Vous ne payerez jamais un téléchargement pour découvrir ensuite un jeton manquant.</p>
+
+<h3>Deux familles de fonctionnement</h3>
+<table>
+  <tr><th style="width:26%">Mode</th><th style="width:30%">Réseaux</th><th>Détail</th></tr>
+  <tr><td><b>URL remise à la plateforme</b></td><td>Instagram, Facebook, TikTok</td><td>Fluxia transmet l'URL ; <b>ce sont les serveurs du réseau qui viennent chercher le fichier</b>. L'URL doit donc être en HTTPS, publique, sans redirection ni protection par cookie. Instagram affiche même un conteneur créé avec succès avant d'échouer au polling : Fluxia attend et signale l'échec réel.</td></tr>
+  <tr><td><b>Octets envoyés par Fluxia</b></td><td>YouTube, Mastodon, Bluesky, X</td><td>Le relais lit la vidéo et la découpe selon le protocole du réseau (multipart YouTube, tranches de 5 Mo pour X, blob brut pour Bluesky). Taille totale plafonnée à 200 Mo côté relais.</td></tr>
+</table>
+
+<h3>Ce que chaque réseau impose</h3>
+<table>
+  <tr><th style="width:16%">Réseau</th><th>Contraintes réelles (vérifiées sur l'API officielle)</th></tr>
+  <tr><td>YouTube</td><td>Un quota d'environ 100 téléversements par jour ; compte Google normal obligatoire (les comptes de service ne peuvent pas téléverser) ; le jeton se passe en en-tête <code>Authorization: Bearer</code>.</td></tr>
+  <tr><td>Mastodon</td><td>Formats MP4 / MOV / WebM ; la limite de poids dépend de <b>votre instance</b> (Fluxia lit <code>video_size_limit</code> via <code>/api/v2/instance</code> et la respecte) ; un seul média vidéo par post ; environ 30 téléversements par 30 minutes.</td></tr>
+  <tr><td>Bluesky</td><td><b>MP4 uniquement</b> — un autre format est rejeté à la publication et Fluxia vous dit de réencoder en H.264/AAC. Limite d'envoi fixée par le PDS : ~5 Mo sur un serveur auto-hébergé par défaut, davantage sur les hébergeurs officiels. Voie simple retenue : le fichier est stocké <b>tel quel, sans transcodage</b> par le service vidéo de Bluesky — la publication est réelle, mais moins optimisée que depuis l'application mobile.</td></tr>
+  <tr><td>X</td><td>Tranches de 5 Mo, puis transcodage asynchrone : Fluxia attend l'état <code>succeeded</code> avant de publier, et signale un <code>failed</code> (format ou durée non supportés).</td></tr>
+  <tr><td>Instagram</td><td>Compte professionnel lié à une Page, app Meta approuvée, minimum 15 minutes entre deux Reels (code 382), HTTPS sans redirection.</td></tr>
+  <tr><td>Facebook</td><td>Jeton de <b>Page</b> (pas personnel), permission <code>publish_video</code> ; l'URL est passée en <code>file_url</code>.</td></tr>
+  <tr><td>TikTok</td><td>App non auditée : <code>SELF_ONLY</code> obligatoire et maximum ~5 publications par utilisateur sur 24 h ; en mode URL, <b>votre domaine doit être vérifié</b> dans le portail développeur, sinon <code>video_pull_failed</code>.</td></tr>
+</table>
+<div class="box tip"><span class="t">Tester sans publier sur votre vrai compte</span>YouTube <i>Privée</i>, Mastodon <i>Abonnés</i>, Bluesky avec un compte de test, TikTok <i>Moi uniquement</i> : le téléversement est réel, l'audience non. C'est la bonne façon de valider un flux avant de l'exposer.</div>
+
+<h2><span class="num">8</span>Le relais local en détail</h2>
+<p><code>server.mjs</code> — zéro dépendance, écoute <b>uniquement sur 127.0.0.1:5174</b>. Il ne stocke rien sur disque et ne parle qu'aux API que votre flux appelle.</p>
+<table>
+  <tr><th style="width:26%">Route</th><th>Rôle</th></tr>
+  <tr><td><code>/api/health</code></td><td>Signale la présence et la version du relais ; l'app l'appelle une seule fois et adapte l'interface.</td></tr>
+  <tr><td><code>/api/relay</code></td><td>Transfert HTTP générique (méthode, en-têtes, corps) vers une API qui refuse le navigateur.</td></tr>
+  <tr><td><code>/api/sheets-append</code></td><td>Signature du JWT de compte de service et appel à l'API Google Sheets.</td></tr>
+  <tr><td><code>/api/video/fetch</code></td><td>Télécharge la vidéo depuis son URL et la retient en mémoire (clé temporaire).</td></tr>
+  <tr><td><code>/api/video/multipart</code> · <code>/chunk</code> · <code>/related</code></td><td>Envoie des tranches du fichier selon le protocole de la plateforme (segments, plages, corps structuré).</td></tr>
+  <tr><td><code>/api/video/release</code></td><td>Libère la vidéo dès que la publication est terminée.</td></tr>
+</table>
+<h3>Limites et sécurité</h3>
+<ul>
+  <li><b>200 Mo</b> maximum par fichier vidéo, <b>15 minutes</b> de rétention en mémoire (purge automatique), délai de téléchargement 180 s, d'envoi 300 s.</li>
+  <li>Une réponse HTML ou texte à une URL de vidéo est refusée explicitement : cela rattrape les liens de lecture au lieu des liens de fichier.</li>
+  <li>Aucune donnée ne sort de votre machine sans votre flux ; l'écoute sur 127.0.0.1 rend le relais inatteignable depuis le réseau.</li>
+  <li>Si un appel répond « Route inconnue », c'est qu'un relais d'une version antérieure tourne encore : relancez <code>npm start</code>.</li>
+</ul>
+<div class="box"><span class="t">Fonctionnement hors ligne</span>Sans relais, tout le reste de l'application continue de fonctionner — y compris les IA locales, le CSV, les conditions et Code JS. Le relais n'est qu'un pont réseau, jamais une dépendance de l'éditeur.</div>
+
+<h2><span class="num">9</span>Les 6 modèles prêts à l'emploi</h2>
+<table>
+  <tr><th style="width:24%">Modèle</th><th style="width:46%">Ce qu'il fait réellement</th><th>Briques</th></tr>
+  <tr><td>Veille API → CSV</td><td>Planificateur → API publique (JSONPlaceholder) → nettoyage des champs → fichier CSV téléchargeable.</td><td>API réelle, Fichier CSV</td></tr>
+  <tr><td>Triage de leads par IA</td><td>Formulaire → classification IA → aiguillage 3 branches : email support, email commercial (Brevo) ou archive CSV.</td><td>Branchements, <b>clé Brevo requise</b></td></tr>
+  <tr><td>Résumé IA → Notification</td><td>Texte d'exemple → résumé local (mots-clés inclus) → notification système du navigateur.</td><td>IA, Sans clé</td></tr>
+  <tr><td>Webhook → Enrichissement → Discord</td><td>Réception d'un évènement, appel API pour le profil, enrichissement en Code JS, empreinte SHA-256 de l'email, post Discord.</td><td>API réelle, Crypto</td></tr>
+  <tr><td>Traitement de commandes</td><td>Éclatement d'une liste, condition sur le montant, alerte email d'un côté, tri + limite + CSV de l'autre.</td><td>Logique, Agrégation</td></tr>
+  <tr><td>Publication vidéo multi-réseaux</td><td>Normalise une vidéo par URL puis publie sur Mastodon, Bluesky et X.</td><td>Relais requis, Publication réelle</td></tr>
+</table>
+<p class="kv">Charger un modèle ne remplace pas vos jetons : ouvrez chaque nœud et renseignez-les, ou utilisez <code>{{ $creds.* }}</code>.</p>
+
+<h2><span class="num">10</span>Raccourcis clavier</h2>
+<table>
+  <tr><th style="width:34%">Raccourci</th><th>Action</th><th style="width:34%">Raccourci</th><th>Action</th></tr>
+  <tr><td><kbd>Ctrl</kbd> <kbd>K</kbd></td><td>Palette de commandes</td><td><kbd>Ctrl</kbd> <kbd>↵</kbd></td><td>Exécuter le flux</td></tr>
+  <tr><td><kbd>Ctrl</kbd> <kbd>Z</kbd></td><td>Annuler</td><td><kbd>Ctrl</kbd> <kbd>⇧</kbd> <kbd>Z</kbd></td><td>Rétablir</td></tr>
+  <tr><td><kbd>Ctrl</kbd> <kbd>C</kbd> / <kbd>V</kbd></td><td>Copier / coller</td><td><kbd>Ctrl</kbd> <kbd>D</kbd></td><td>Dupliquer</td></tr>
+  <tr><td><kbd>Ctrl</kbd> <kbd>A</kbd></td><td>Tout sélectionner</td><td><kbd>Ctrl</kbd> <kbd>S</kbd></td><td>Sauvegarde locale immédiate</td></tr>
+  <tr><td><kbd>D</kbd></td><td>Activer / désactiver le nœud sélectionné</td><td><kbd>Suppr</kbd></td><td>Supprimer la sélection</td></tr>
+  <tr><td><kbd>Maj</kbd> + glisser</td><td>Sélection multiple</td><td>Clic droit</td><td>Menu contextuel (nœud, connexion, canvas)</td></tr>
+</table>
+
+<h2><span class="num">11</span>Dépannage</h2>
+<table>
+  <tr><th style="width:36%">Message affiché</th><th style="width:28%">Cause réelle</th><th>Solution</th></tr>
+  <tr><td>« … est bloqué par le navigateur (CORS). Lancez le relais local »</td><td>Le relais n'est pas démarré.</td><td><code>npm start</code> (ou <code>node server.mjs</code>) puis relancez le flux — vérifiez <code>http://127.0.0.1:5174/api/health</code>.</td></tr>
+  <tr><td>« Jeton d'accès … manquant — … scopes … »</td><td>Champ vide ou non résolu.</td><td>Renseignez le champ, ou <code>{{ $creds.nom }}</code> après l'avoir enregistré dans Identifiants.</td></tr>
+  <tr><td>« URL de vidéo invalide » / « L'URL ne renvoie pas une vidéo mais du text/html »</td><td>Lien page de lecture, ou lien raccourci / protégé.</td><td>Utilisez le lien direct du fichier (se termine par <code>.mp4</code>, ouvre la vidéo dans un onglet vierge).</td></tr>
+  <tr><td>« Bluesky n'accepte que du MP4 : reconnu comme … »</td><td>Le PDS a reniflé un autre format.</td><td>Réencodez en H.264 / AAC (MP4) puis relancez.</td></tr>
+  <tr><td>« … accepte X Mo par fichier »</td><td>Limite d'envoi du PDS ou de l'instance dépassée.</td><td>Réduisez le poids, ou changez d'hébergeur / demandez à l'admin d'augmenter la limite.</td></tr>
+  <tr><td>Instagram « status_code = ERROR »</td><td>Meta n'a pas pu récupérer la vidéo.</td><td>URL en HTTPS, sans redirection, publique, sans protection par cookie.</td></tr>
+  <tr><td>TikTok <code>video_pull_failed</code></td><td>Domaine non vérifié dans le portail développeur.</td><td>Ajoutez votre domaine dans Developer Portal → Products → Content Posting → <i>Domain verification</i>.</td></tr>
+  <tr><td>« Meta … [code 382] »</td><td>Deux Reels trop rapprochés.</td><td>Attendre 15 minutes, ou ajouter un nœud <i>Attendre</i> dans un flux récurrent.</td></tr>
+  <tr><td>« Meta … [code 190] »</td><td>Jeton expiré.</td><td>Régénérer le jeton (les jetons longue durée nécessitent une app approuvée).</td></tr>
+  <tr><td>« X a rejeté le traitement de la vidéo »</td><td>Format, durée ou résolution non supportés.</td><td>Réencoder en MP4 H.264/AAC, durée raisonnable, puis relancer.</td></tr>
+  <tr><td>Brevo refuse l'envoi</td><td>Expéditeur non validé dans Brevo.</td><td>Vérifiez l'adresse (domaine ou email) dans Brevo → Expéditeurs.</td></tr>
+  <tr><td>Google Sheets « permission denied »</td><td>Classeur non partagé avec le compte de service.</td><td>Partager le classeur en <b>éditeur</b> avec <code>client_email</code>.</td></tr>
+  <tr><td>Notion ne crée pas la page</td><td>Base non connectée à l'intégration ou propriété titre différente.</td><td>Cochez la base dans l'intégration ; alignez <b>Propriété titre</b> sur le nom réel.</td></tr>
+  <tr><td>« Délai dépassé … (30 s) »</td><td>Réseau lent ou API distante saturée.</td><td>Relancer ; pour une vidéo lourde, vérifiez d'abord le relais (jusqu'à 300 s côté envoi).</td></tr>
+  <tr><td>Un nœud reste gris / « ignoré »</td><td>Sa branche n'a pas été empruntée (Condition ou Aiguillage).</td><td>Comportement normal : vérifiez la valeur testée dans le journal.</td></tr>
+  <tr><td>Boucle détectée à l'exécution</td><td>Connexion qui revient en arrière dans le graphe.</td><td>Coupez le lien retour ; pour un vrai cycle, passez par <i>Fusionner</i>.</td></tr>
+  <tr><td>Le flux disparaît après un nettoyage du navigateur</td><td><code>localStorage</code> effacé.</td><td><b>Export JSON</b> régulier ; versionnez vos flux dans Git.</td></tr>
+</table>
+
+<h2><span class="num">12</span>Vos données, sécurité et bonnes pratiques</h2>
+<ul>
+  <li><b>100 % local.</b> Flux et identifiants vivent dans le <code>localStorage</code> du navigateur. Aucun serveur Fluxia, aucun compte, aucune télémétrie.</li>
+  <li><b>Le relais ne fait que transiter</b>, en mémoire, sur 127.0.0.1. Les jetons ne sont jamais écrits sur disque par le relais.</li>
+  <li><b>Les IA locales n'envoient rien</b> ; seuls les moteurs « OpenAI compatible » sortent votre texte, et seulement si vous fournissez une clé.</li>
+  <li><b>Ne partagez jamais un export JSON contenant des secrets</b> : les paramètres des nœuds sont dedans. Préférez <code>{{ $creds.* }}</code> et gardez les clés hors du fichier, ou nettoyez-les avant publication.</li>
+  <li><b>Méfiez-vous du nœud Code JS</b> : JavaScript exécuté sans bac à sable. Relisez tout flux importé contenant ce nœud.</li>
+  <li><b>Rotation</b> : les jetons d'application (Meta, X, TikTok) expirent ou sont révoqués ; en cas de refus d'authentification, régénérez avant de chercher un bug dans le flux.</li>
+  <li><b>Quotas</b> : YouTube ~100 uploads/jour, TikTok ~5 publications/24 h par utilisateur non audité, Mastodon ~30 uploads/30 min, Instagram 15 min entre Reels. Pour un flux récurrent, ajoutez <i>Attendre</i> et limitez avec <i>Limiter</i>.</li>
+  <li><b>Accessibilité</b> : renseignez le <i>Texte alternatif vidéo</i> sur Mastodon et Bluesky — c'est un champ réel, pas un décor.</li>
+</ul>
+
+<h2><span class="num">13</span>Annexe technique</h2>
+<h3>Arborescence</h3>
+<pre>server.mjs                  # Relais local optionnel + sert dist/
+src/
+├── types.ts                 # Types partagés (nœud, élément, exécution, familles)
+├── data/
+│   ├── catalog.tsx          # 44 définitions de nœuds : icône, couleur, paramètres, ports
+│   └── templates.ts         # 6 flux prêts à l'emploi
+├── engine/
+│   ├── expressions.ts       # {{ $json }} {{ $items }} {{ $node }} {{ $now }} {{ $creds }}
+│   ├── engine.ts            # Ordre topologique, branchements, exécuteurs de nœuds
+│   ├── relay.ts             # Client du relais : /api/relay, /api/video/*
+│   └── video.ts             # 7 publications réseau réelles + contrôle préalable
+├── store/store.ts           # zustand : graphe, historique, exécution, toasts, identifiants
+└── components/              # Canvas, FlowNode, FlowEdge, StickyNote, ConfigPanel,
+                             # ExecutionPanel, CommandPalette, CredentialsModal,
+                             # TemplatesModal, ContextMenu, TopBar, JsonView, Toasts</pre>
+
+<h3>Ajouter un nœud</h3>
+<ol>
+  <li>Une entrée dans <code>src/data/catalog.tsx</code> : type, libellé, famille, icône, description, nombre d'entrées, libellés de sorties, liste des paramètres.</li>
+  <li>Un <code>case</code> dans l'exécuteur de nœud (<code>src/engine/engine.ts</code>) — ou une fonction dédiée si le nœud appelle un réseau, comme dans <code>video.ts</code>.</li>
+  <li>Formulaire, poignées, palette, menu contextuel, export JSON : tout suit automatiquement.</li>
+</ol>
+
+<h3>Pile technique</h3>
+<p class="kv">React 19 · TypeScript 5 strict · Vite 8 (rolldown) · @xyflow/react 12 (React Flow, MIT, attribution conservée) · zustand 5 · motion 12 · Tailwind CSS 4 · dagre · lucide-react. Nœuds et connexions mémoïsés, compilation des expressions mise en cache, build découpé en 4 chunks (React, React Flow, motion, application).</p>
+
+<h3>Qualité</h3>
+<ul>
+  <li><b>CI</b> : GitHub Actions sur chaque poussée — type-check, lint, build.</li>
+  <li><b>Pages</b> : déploiement automatique de <code>dist/</code> sur <code>main</code>.</li>
+  <li><b>Licence</b> : MIT — usage commercial autorisé, attribution requise, sans garantie.</li>
+  <li><b>Dépôt</b> : <code>github.com/ck526438-lgtm/fluxia</code> — issues et contributions ouvertes.</li>
+</ul>
+
+<div class="foot">
+  Fluxia 1.0 — Guide d'utilisation complet · octobre 2026 · Licence MIT du logiciel · Reproduit depuis le contenu réel de l'application (44 nœuds, 6 modèles, relais v2). Les contraintes de plateforme listées au chapitre 7 proviennent de la documentation officielle des API et de tests réels effectués le 19 octobre 2026 ; elles peuvent évoluer du fait des services tiers.
+</div>
+
+</body>
+</html>

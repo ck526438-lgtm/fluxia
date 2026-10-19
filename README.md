@@ -19,6 +19,13 @@ redéployée automatiquement à chaque push. Version 100 % navigateur : le relai
 (Slack, Google Sheets, publication vidéo, API fermées CORS) reste un extra de
 l'installation locale.
 
+**📕 Guide d'utilisation complet (PDF, 18 pages) : [docs/guide-utilisation.pdf](docs/guide-utilisation.pdf)** —
+installation, visite de l'interface, expressions `{{ … }}`, **référence des 44 nœuds paramètre par
+paramètre**, où obtenir chaque clé API, publication vidéo (endpoints, limites, erreurs réelles),
+relais local, 6 modèles, raccourcis, tableau de dépannage et bonnes pratiques de sécurité.
+Source imprimable : [docs/guide-utilisation.html](docs/guide-utilisation.html)
+(`msedge --headless --print-to-pdf=docs/guide-utilisation.pdf docs/guide-utilisation.html` pour le régénérer).
+
 ## Démarrage
 
 ```bash
@@ -150,6 +157,10 @@ le créer, plutôt qu'après 200 Mo de transfert.
 
 ```
 server.mjs                  # Relais local : /api/relay, /api/sheets-append, /api/video/* + sert dist/
+docs/
+├── guide-utilisation.pdf   # Guide d'utilisation complet — 18 pages, français
+├── guide-utilisation.html  # Sa source imprimable (rendu Edge/Chrome --print-to-pdf)
+└── screenshot.png          # Capture du canvas affichée en haut de ce README
 src/
 ├── types.ts                 # Types partagés (nœud, item, exécution…)
 ├── data/
